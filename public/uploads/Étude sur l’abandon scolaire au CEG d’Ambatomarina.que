@@ -1,0 +1,208 @@
+*TITRE
+Étude sur l’abandon scolaire au CEG d’Ambatomarina
+
+*INTRO
+Bonjour, ce questionnaire est **anonyme** et a pour but de mieux comprendre les causes d’abandon scolaire dans les classes de 4ème et 3ème du Collège d'Enseignement Général (CEG) d’Ambatomarina. Merci de répondre avec sincérité.
+
+*SECTION
+1 - Identification de l’élève
+
+*QUESTION
+Quel est ton sexe ?
+%sexe
+# Liste
+Homme
+Femme
+
+*QUESTION
+Quel est ton âge ?
+%age
+# Numérique
+
+*QUESTION
+Dans quelle classe es-tu actuellement ?
+%classe
+# Liste
+4ème
+3ème
+
+*QUESTION
+Quelle est ta situation familiale ?
+%situation_fam
+# Liste
+Parents ensemble
+Parents séparés
+Orphelin d’un parent
+Orphelin des deux parents
+
+*QUESTION
+Combien as-tu de frères et sœurs ?
+%nb_freres_soeurs
+# Numérique
+
+*QUESTION
+Quel est ton rang dans la fratrie ?
+%rang
+# Numérique
+
+*SECTION
+2 - Parcours scolaire
+
+*QUESTION
+As-tu déjà redoublé une classe ?
+%redoublement
+# OuiNon
+
+*QUESTION [SI redoublement=Oui]
+Combien de fois as-tu redoublé ?
+%nb_redoublements
+# Numérique
+
+*QUESTION
+As-tu déjà abandonné l’école auparavant ?
+%abandon_prec
+# OuiNon
+
+*QUESTION [SI abandon_prec=Oui]
+Combien de temps a duré cet abandon ?
+%duree_abandon
+# Liste
+Moins de 3 mois
+3 à 6 mois
+Plus de 6 mois
+
+*QUESTION
+Quelle matière trouves-tu la plus difficile ?
+%matiere_difficile
+# Liste
+Maths
+Français
+Histoire-Géographie
+SVT
+Physique
+Anglais
+Autre
+
+*QUESTION
+Es-tu souvent absent à l’école ?
+%frequence_absence
+# Liste
+Jamais
+Rarement
+Parfois
+Souvent
+
+*SECTION
+3 - Situation familiale et économique
+
+*QUESTION
+Tes parents t'encouragent-ils à continuer l'école ?
+%encouragement_parents
+# Liste
+Oui
+Non
+Parfois
+
+*QUESTION
+Profession du père :
+%profession_pere
+# Texte
+
+*QUESTION
+Profession de la mère :
+%profession_mere
+# Texte
+
+*QUESTION
+Avez-vous assez de ressources pour financer ta scolarité ?
+%ressources_scol
+# OuiNon
+
+*QUESTION
+As-tu déjà travaillé pour aider ta famille ?
+%travail_famille
+# OuiNon
+
+*QUESTION [SI travail_famille=Oui]
+Quel type de travail as-tu effectué ?
+%type_travail
+# Liste
+Agriculture
+Vente
+Aide ménagère
+Bricolage
+Autre
+
+*SECTION
+4 - Motivation scolaire
+
+*QUESTION
+Te sens-tu bien à l’école ?
+%bien_a_ecole
+# Liste
+Oui
+Non
+Moyennement
+
+*QUESTION
+As-tu des amis à l’école ?
+%amis_ecole
+# OuiNon
+
+*QUESTION
+Qu’est-ce qui te motive à venir à l’école ?
+%motivation_ecole
+# Liste
+Apprendre
+Réussir dans la vie
+Faire plaisir aux parents
+Voir les amis
+Autre
+
+*QUESTION
+As-tu déjà pensé à abandonner l’école ?
+%pense_abandon
+# OuiNon
+
+*QUESTION [SI pense_abandon=Oui]
+Pour quelles raisons as-tu pensé à abandonner ?
+%raison_pense_abandon
+# Liste
+Difficultés scolaires
+Problèmes familiaux
+Manque d’argent
+Travaux à la maison
+Découragement
+Autre
+
+*SECTION
+5 - Projet d’avenir
+
+*QUESTION
+As-tu un projet professionnel ou scolaire ?
+%projet_avenir
+# OuiNon
+
+*QUESTION [SI projet_avenir=Oui]
+Quel est ton rêve ou ton métier souhaité ?
+%metier_souhaite
+# Texte
+
+*QUESTION
+Tes parents soutiennent-ils ce projet ?
+%soutien_projet
+# Liste
+Oui
+Non
+Je ne sais pas
+
+*SECTION
+6 - Suggestion libre
+
+*QUESTION
+Que faudrait-il améliorer pour t’éviter d’abandonner l’école ?
+%amelioration_souhaitee
+# TexteLong
+
+*CONCLUSION
+Merci pour ta participation ! Tes réponses sont précieuses pour améliorer les conditions d’apprentissage au sein de ton école.
