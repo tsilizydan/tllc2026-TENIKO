@@ -17,7 +17,11 @@
     </div>
     <div class="form-group">
       <label class="form-label" for="password">Password</label>
-      <input type="password" id="password" name="password" class="form-control" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+      <div class="pwd-field">
+        <input type="password" id="password" name="password" class="form-control" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+        <button type="button" class="pwd-toggle" data-target="password" aria-label="Show password"><i class="fa fa-eye"></i></button>
+      </div>
+      <span class="form-hint">Minimum 8 characters.</span>
     </div>
     <p style="font-size:.8rem;color:var(--clr-text-muted);margin-bottom:1.25rem;line-height:1.6">
       By registering, you agree to our <a href="/terms" style="color:var(--clr-primary)">Terms of Service</a> and <a href="/privacy" style="color:var(--clr-primary)">Privacy Policy</a>.

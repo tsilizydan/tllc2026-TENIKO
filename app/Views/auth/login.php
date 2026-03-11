@@ -17,7 +17,10 @@
         Password
         <a href="/forgot-password" style="float:right;font-size:.8rem;color:var(--clr-primary);font-weight:400">Forgot password?</a>
       </label>
-      <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+      <div class="pwd-field">
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        <button type="button" class="pwd-toggle" data-target="password" aria-label="Show password"><i class="fa fa-eye"></i></button>
+      </div>
     </div>
     <label class="flex" style="gap:.5rem;align-items:center;margin-bottom:1.5rem;cursor:pointer;font-size:.9rem">
       <input type="checkbox" name="remember"> Remember me for 30 days

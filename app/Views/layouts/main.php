@@ -21,12 +21,15 @@ $isLoggedIn  = \App\Core\Auth::check();
 $authUser    = \App\Core\Auth::user();
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title><?= e($pageTitle ?? $siteName) ?></title>
+  <script>/* Prevent FOUC */
+  (function(){var t=localStorage.getItem('teniko-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();
+  </script>
   <meta name="description" content="<?= e($metaDesc ?? 'The Living Archive of Malagasy Language & Culture.') ?>">
   <meta name="csrf-token" content="<?= e($csrfToken) ?>">
 
@@ -87,7 +90,7 @@ $authUser    = \App\Core\Auth::user();
     <div class="nav__actions">
       <!-- Theme toggle -->
       <button class="btn-icon btn-ghost" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle theme">
-        <i class="fa fa-moon" id="theme-icon"></i>
+        <i class="fa fa-moon theme-icon"></i>
       </button>
 
       <?php if ($isLoggedIn): ?>
@@ -225,11 +228,5 @@ $authUser    = \App\Core\Auth::user();
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script src="/assets/js/app.js"></script>
 <script src="/assets/js/search.js"></script>
-<script>
-  // Sync theme icon
-  const theme = document.documentElement.getAttribute('data-theme');
-  const icon  = document.getElementById('theme-icon');
-  if (icon) icon.className = theme === 'dark' ? 'fa fa-sun' : 'fa fa-moon';
-</script>
 </body>
 </html>
