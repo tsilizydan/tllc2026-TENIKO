@@ -1,0 +1,13 @@
+{
+    "name": "teniko/platform",
+    "description": "TENIKO - The Malagasy Language & Culture Encyclopedia",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require": {
+        "php": ">=8.3"
+    }
+}
