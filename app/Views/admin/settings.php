@@ -47,5 +47,22 @@ $csrfToken = \App\Core\CSRF::generate(); ?>
       </div>
     </div>
   </div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card__body">
+      <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-heart" style="color:var(--clr-accent)"></i> Donation Floating Widget</h2>
+      <div class="form-group">
+        <label class="form-label">Show Floating Donation Widget</label>
+        <select name="settings[donate_float_enabled]" class="form-control">
+          <option value="0" <?= ($settings['donate_float_enabled'] ?? '0') === '0' ? 'selected' : '' ?>>Hidden</option>
+          <option value="1" <?= ($settings['donate_float_enabled'] ?? '0') === '1' ? 'selected' : '' ?>>Visible to all visitors</option>
+        </select>
+        <span class="form-hint">When enabled, a donation card appears in the bottom-right corner of all public pages</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Widget Message</label>
+        <input type="text" name="settings[donate_float_message]" class="form-control" value="<?= e($settings['donate_float_message'] ?? 'Help us preserve Malagasy language & culture!') ?>" placeholder="Short compelling message">
+      </div>
+    </div>
+  </div>
   <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-save"></i> Save All Settings</button>
 </form>
