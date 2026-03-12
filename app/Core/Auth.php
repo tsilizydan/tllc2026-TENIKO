@@ -107,8 +107,12 @@ class Auth
         self::requireLogin();
         if (!self::isAdmin()) {
             http_response_code(403);
-            $view = new View();
-            $view->render('errors/403', [], 'main');
+            try {
+                $view = new View();
+                $view->render('errors/error', ['code' => 403, 'message' => 'Admin access required.']);
+            } catch (\Throwable) {
+                echo '<h1>403 — Forbidden</h1><p><a href="/">Go Home</a></p>';
+            }
             exit;
         }
     }
@@ -118,8 +122,12 @@ class Auth
         self::requireLogin();
         if (!self::isModerator()) {
             http_response_code(403);
-            $view = new View();
-            $view->render('errors/403', [], 'main');
+            try {
+                $view = new View();
+                $view->render('errors/error', ['code' => 403, 'message' => 'Moderator access required.']);
+            } catch (\Throwable) {
+                echo '<h1>403 — Forbidden</h1><p><a href="/">Go Home</a></p>';
+            }
             exit;
         }
     }
