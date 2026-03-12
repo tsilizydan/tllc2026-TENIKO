@@ -23,7 +23,7 @@ if (file_exists($envFile)) {
 }
 
 // ── Global exception / error handler ─────────────────────────
-ini_set('display_errors', '0'); // Suppress PHP's own output; we handle it
+ini_set('display_errors', '1'); // TEMP: enabled for debugging dialect 500
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
@@ -39,15 +39,13 @@ set_exception_handler(function (\Throwable $e) {
     if (!headers_sent()) http_response_code(500);
 
     // Show detailed error for diagnosis
-    echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>500 Error</title></head><body>';
-    echo '<div style="background:#fef2f2;border:2px solid #fca5a5;border-radius:8px;padding:2rem;margin:2rem;font-family:monospace;max-width:900px">';
-    echo '<h2 style="color:#dc2626;margin:0 0 1rem">' . htmlspecialchars(get_class($e)) . '</h2>';
-    echo '<p><strong>Message:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
-    echo '<p><strong>File:</strong> ' . htmlspecialchars($e->getFile()) . ':' . $e->getLine() . '</p>';
-    echo '<details><summary style="cursor:pointer;color:#6b7280">Stack Trace</summary>';
-    echo '<pre style="overflow:auto;font-size:11px;color:#374151;margin-top:.5rem">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
-    echo '</details>';
-    echo '<p style="margin-top:1rem"><a href="/" style="color:#2563eb">Go Home</a></p>';
+    echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>500 Error — Debug</title><style>body{font-family:monospace;margin:0;padding:2rem;background:#1a1a1a;color:#e8e8e8}</style></head><body>';
+    echo '<div style="background:#450a0a;border:2px solid #dc2626;border-radius:8px;padding:2rem;margin:0 auto;max-width:1000px">';
+    echo '<h2 style="color:#fca5a5;margin:0 0 1rem">' . htmlspecialchars(get_class($e)) . '</h2>';
+    echo '<p><strong style="color:#fca5a5">Message:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p><strong style="color:#fca5a5">File:</strong> ' . htmlspecialchars($e->getFile()) . ':' . $e->getLine() . '</p>';
+    echo '<pre style="overflow:auto;font-size:12px;color:#d1d5db;background:#111;padding:1rem;border-radius:4px;margin-top:1rem">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    echo '<p style="margin-top:1rem"><a href="/" style="color:#60a5fa">Go Home</a></p>';
     echo '</div></body></html>';
 });
 
