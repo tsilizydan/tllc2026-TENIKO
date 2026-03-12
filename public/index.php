@@ -22,6 +22,23 @@ if (file_exists($envFile)) {
     }
 }
 
+// ── Global exception / error handler ─────────────────────────
+set_exception_handler(function (\Throwable $e) {
+    error_log('[TENIKO] Uncaught: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+    if (!headers_sent()) http_response_code(500);
+    try {
+        $v = new App\Core\View();
+        $v->render('errors/error', ['code' => 500, 'message' => 'An unexpected error occurred.']);
+    } catch (\Throwable) {
+        echo '<h1>500 — Server Error</h1><p>Please try again later. <a href="/">Go home</a></p>';
+    }
+});
+
+set_error_handler(function (int $severity, string $msg, string $file, int $line): bool {
+    if (!(error_reporting() & $severity)) return false;
+    throw new \ErrorException($msg, 0, $severity, $file, $line);
+});
+
 // Autoloader (PSR-4 style without Composer in dev)
 spl_autoload_register(function (string $class): void {
     $prefix   = 'App\\';
