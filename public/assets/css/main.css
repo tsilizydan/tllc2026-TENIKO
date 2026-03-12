@@ -200,7 +200,9 @@ p { margin-bottom: var(--sp-4); color: var(--clr-text); }
   display: flex;
   align-items: center;
   height: 100%;
-  gap: var(--sp-8);
+  gap: var(--sp-4);
+  /* Prevent overall row from overflowing */
+  overflow: hidden;
 }
 
 .nav__logo {
@@ -219,17 +221,22 @@ p { margin-bottom: var(--sp-4); color: var(--clr-text); }
 .nav__links {
   display: flex;
   align-items: center;
-  gap: var(--sp-1);
-  flex: 1;
+  gap: 2px;
+  /* Take available space but shrink — never push actions off-screen */
+  flex: 1 1 0;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .nav__link {
-  padding: var(--sp-2) var(--sp-3);
+  padding: var(--sp-2) 10px;
   border-radius: var(--radius-md);
-  font-size: var(--fs-sm);
+  font-size: 0.8125rem;   /* 13px — keeps links compact */
   font-weight: 500;
+  white-space: nowrap;
   color: var(--clr-text-muted);
   transition: color var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .nav__link:hover, .nav__link.active {
@@ -240,17 +247,43 @@ p { margin-bottom: var(--sp-4); color: var(--clr-text); }
 .nav__actions {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
+  flex-shrink: 0;          /* NEVER shrink — always visible */
+  min-width: 0;
+}
+
+/* Avatar circle in nav */
+.nav__avatar {
+  width: 30px;
+  height: 30px;
+  background: var(--clr-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
-/* Mobile hamburger */
+/* Username text truncates if needed */
+.nav__username {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+}
+
+/* Mobile hamburger — shown at ≤1024px */
 .nav__burger {
-  display: none;
+  display: none;   /* shown via media query below */
   flex-direction: column;
   gap: 5px;
   padding: var(--sp-2);
   border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
 .nav__burger span {
   display: block;
@@ -259,6 +292,36 @@ p { margin-bottom: var(--sp-4); color: var(--clr-text); }
   background: var(--clr-charcoal);
   border-radius: 2px;
   transition: transform var(--transition-normal), opacity var(--transition-fast);
+}
+[data-theme="dark"] .nav__burger span { background: var(--clr-text); }
+
+/* ── Responsive nav breakpoints ───────────────────────── */
+
+/* ≤ 1180px: hide Login/Register text labels — keep only icons + burger */
+@media (max-width: 1180px) {
+  .nav__link { padding: var(--sp-2) 8px; font-size: .75rem; }
+  .nav__inner { gap: var(--sp-3); }
+}
+
+/* ≤ 1024px: collapse nav links into hamburger drawer */
+@media (max-width: 1024px) {
+  .nav__links { display: none; }       /* hide desktop links */
+  .nav__burger { display: flex; }      /* show hamburger */
+  /* Hide text-only action buttons (Login/Register/Admin/Logout) in top bar */
+  .nav__login-btn,
+  .nav__register-btn,
+  .nav__admin-btn,
+  .nav__logout-btn { display: none; }
+  /* Keep icon buttons (theme toggle, notifications) */
+  .nav__notif-btn { display: flex; }
+  /* Keep user avatar button but drop username text */
+  .nav__username { display: none; }
+}
+
+/* ≤ 768px: tighten container padding */
+@media (max-width: 768px) {
+  .container { padding: 0 var(--sp-4); }
+  .nav__inner { gap: var(--sp-2); }
 }
 
 /* Mobile drawer */
