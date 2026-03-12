@@ -23,19 +23,42 @@ if (file_exists($envFile)) {
 }
 
 // ── Global exception / error handler ─────────────────────────
+ini_set('display_errors', '0'); // Suppress PHP's own output; we handle it
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
+
 set_exception_handler(function (\Throwable $e) {
-    error_log('[TENIKO] Uncaught: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-    if (!headers_sent()) http_response_code(500);
-    try {
-        $v = new App\Core\View();
-        $v->render('errors/error', ['code' => 500, 'message' => 'An unexpected error occurred.']);
-    } catch (\Throwable) {
-        echo '<h1>500 — Server Error</h1><p>Please try again later. <a href="/">Go home</a></p>';
+    // Log first
+    error_log('[TENIKO] Uncaught ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+
+    // Clean ALL output buffers so partial page HTML is discarded
+    while (ob_get_level() > 0) {
+        ob_end_clean();
     }
+
+    if (!headers_sent()) http_response_code(500);
+
+    // Show detailed error for diagnosis
+    echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>500 Error</title></head><body>';
+    echo '<div style="background:#fef2f2;border:2px solid #fca5a5;border-radius:8px;padding:2rem;margin:2rem;font-family:monospace;max-width:900px">';
+    echo '<h2 style="color:#dc2626;margin:0 0 1rem">' . htmlspecialchars(get_class($e)) . '</h2>';
+    echo '<p><strong>Message:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p><strong>File:</strong> ' . htmlspecialchars($e->getFile()) . ':' . $e->getLine() . '</p>';
+    echo '<details><summary style="cursor:pointer;color:#6b7280">Stack Trace</summary>';
+    echo '<pre style="overflow:auto;font-size:11px;color:#374151;margin-top:.5rem">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    echo '</details>';
+    echo '<p style="margin-top:1rem"><a href="/" style="color:#2563eb">Go Home</a></p>';
+    echo '</div></body></html>';
 });
 
+// Only convert actual PHP Errors (not notices/warnings) into exceptions
 set_error_handler(function (int $severity, string $msg, string $file, int $line): bool {
-    if (!(error_reporting() & $severity)) return false;
+    if (!($severity & error_reporting())) return false;
+    // Notices, deprecations, strict — just log, don't throw
+    if ($severity & (E_NOTICE | E_USER_NOTICE | E_DEPRECATED | E_USER_DEPRECATED | E_STRICT | E_WARNING | E_USER_WARNING)) {
+        error_log("[TENIKO] {$msg} in {$file}:{$line}");
+        return true;
+    }
     throw new \ErrorException($msg, 0, $severity, $file, $line);
 });
 
