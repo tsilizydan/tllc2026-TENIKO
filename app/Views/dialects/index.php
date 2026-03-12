@@ -27,12 +27,12 @@
         // Map region keywords to flag emojis
         $emoji = '🗺️';
         $rLow = strtolower($dRegion);
-        if (str_contains($rLow, 'nord') || str_contains($rLow, 'north'))        $emoji = '🌍';
-        elseif (str_contains($rLow, 'sud') || str_contains($rLow, 'south'))     $emoji = '🌟';
-        elseif (str_contains($rLow, 'est') || str_contains($rLow, 'east'))      $emoji = '🌊';
-        elseif (str_contains($rLow, 'ouest') || str_contains($rLow, 'west'))    $emoji = '⛰️';
-        elseif (str_contains($rLow, 'central') || str_contains($rLow, 'haut')) $emoji = '🏔️';
-        elseif (str_contains($rLow, 'côte') || str_contains($rLow, 'coast'))    $emoji = '🌴';
+        if (strpos($rLow, 'nord') !== false || strpos($rLow, 'north') !== false)        $emoji = '🌍';
+        elseif (strpos($rLow, 'sud') !== false || strpos($rLow, 'south') !== false)     $emoji = '🌟';
+        elseif (strpos($rLow, 'est') !== false || strpos($rLow, 'east') !== false)      $emoji = '🌊';
+        elseif (strpos($rLow, 'ouest') !== false || strpos($rLow, 'west') !== false)    $emoji = '⛰️';
+        elseif (strpos($rLow, 'central') !== false || strpos($rLow, 'haut') !== false)  $emoji = '🏔️';
+        elseif (strpos($rLow, 'côte') !== false || strpos($rLow, 'coast') !== false)    $emoji = '🌴';
       ?>
       <a href="/dialect/<?= e($dCode) ?>" class="card dialect-card animate-fade-up"
          style="animation-delay:<?= $i * .06 ?>s;text-decoration:none;display:block"
