@@ -47,9 +47,16 @@ $authUser    = \App\Core\Auth::user();
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <!-- Animate.css -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- Favicons (SEO + PWA) -->
+  <link rel="icon" type="image/png" href="/assets/imgs/favicon/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/svg+xml" href="/assets/imgs/favicon/favicon.svg">
+  <link rel="shortcut icon" href="/assets/imgs/favicon/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/imgs/favicon/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="TENIKO">
+  <link rel="manifest" href="/assets/imgs/favicon/site.webmanifest">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/main.css">
-  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/supplement.css">
 </head>
 <body <?= $isLoggedIn ? 'data-logged-in="1"' : '' ?>>
 
@@ -162,11 +169,12 @@ $authUser    = \App\Core\Auth::user();
 </div>
 
 <!-- ── Flash Messages ─────────────────────────────────────── -->
-<?php if (!empty($flash_success) || !empty($flash_error) || !empty($flash_info)): ?>
-<div class="container" style="padding-top:1rem">
+<?php if (!empty($flash_success) || !empty($flash_error) || !empty($flash_info) || !empty($flash_warning)): ?>
+<div class="flash-bar container">
   <?php if (!empty($flash_success)): ?><div class="alert alert-success" data-auto-dismiss><i class="fa fa-check-circle"></i> <?= e($flash_success) ?></div><?php endif; ?>
   <?php if (!empty($flash_error)):   ?><div class="alert alert-error"   data-auto-dismiss><i class="fa fa-times-circle"></i> <?= e($flash_error) ?></div><?php endif; ?>
   <?php if (!empty($flash_info)):    ?><div class="alert alert-info"    data-auto-dismiss><i class="fa fa-info-circle"></i> <?= e($flash_info) ?></div><?php endif; ?>
+  <?php if (!empty($flash_warning)): ?><div class="alert alert-warning" data-auto-dismiss><i class="fa fa-exclamation-circle"></i> <?= e($flash_warning) ?></div><?php endif; ?>
 </div>
 <?php endif; ?>
 
@@ -209,10 +217,11 @@ $authUser    = \App\Core\Auth::user();
         <a href="/sitemap.xml" class="footer__link">Sitemap</a>
         <!-- Newsletter mini-form -->
         <div style="margin-top:1rem">
-          <form action="/newsletter/subscribe" method="POST" style="display:flex;gap:.5rem;margin-top:.5rem">
+          <p style="font-size:.8rem;color:rgba(255,255,255,.6);margin-bottom:.5rem">Newsletter</p>
+          <form id="footer-newsletter-form" style="display:flex;gap:.5rem">
             <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
             <input type="email" name="email" placeholder="Your email" required aria-label="Subscribe to newsletter"
-              style="flex:1;padding:.5rem .75rem;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;font-size:.8rem">
+              style="flex:1;padding:.5rem .75rem;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;font-size:.8rem;min-width:0">
             <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
           </form>
         </div>
@@ -224,6 +233,75 @@ $authUser    = \App\Core\Auth::user();
     </div>
   </div>
 </footer>
+
+<!-- ── Donation Floating Widget ──────────────────────────── -->
+<?php
+$donateFloat = false;
+try {
+    $fDb = \App\Core\Database::getInstance();
+    $fSetting = $fDb->fetch("SELECT value FROM site_settings WHERE `key`='donate_float_enabled'");
+    $donateFloat = ($fSetting['value'] ?? '0') === '1';
+    $donateMsg = $fDb->fetch("SELECT value FROM site_settings WHERE `key`='donate_float_message'")['value'] ?? 'Help us preserve Malagasy language & culture!';
+    $donateGoal = (float)($fDb->fetch("SELECT value FROM site_settings WHERE `key`='donation_goal'")['value'] ?? 5000);
+    $donateRaised = (float)($fDb->fetch("SELECT COALESCE(SUM(amount),0) AS v FROM donations WHERE status='completed'")['v'] ?? 0);
+    $donateProgress = $donateGoal > 0 ? min(100, round(($donateRaised / $donateGoal) * 100)) : 0;
+} catch (\Throwable) {}
+?>
+<?php if ($donateFloat): ?>
+<div id="donate-float" class="donate-float" role="complementary" aria-label="Donation widget">
+  <button class="donate-float__close" onclick="closeDonateFloat()" aria-label="Close donation box"><i class="fa fa-times"></i></button>
+  <div class="donate-float__icon"><i class="fa fa-heart"></i></div>
+  <h3 class="donate-float__title">Support TENIKO</h3>
+  <p class="donate-float__msg"><?= e($donateMsg ?? '') ?></p>
+  <?php if ($donateGoal > 0): ?>
+  <div class="donate-float__progress">
+    <div class="donate-float__bar"><div style="width:<?= $donateProgress ?>%"></div></div>
+    <span>€<?= number_format($donateRaised, 0) ?> of €<?= number_format($donateGoal, 0) ?> goal</span>
+  </div>
+  <?php endif; ?>
+  <a href="/donate" class="btn btn-primary btn-sm w-full" style="margin-top:.75rem"><i class="fa fa-heart"></i> Donate Now</a>
+  <p style="font-size:.7rem;text-align:center;color:var(--clr-text-muted);margin-top:.5rem">Via Stripe · PayPal · Bank Transfer</p>
+</div>
+<script>
+function closeDonateFloat() {
+  document.getElementById('donate-float').style.display = 'none';
+  sessionStorage.setItem('teniko-donate-dismissed', '1');
+}
+if (sessionStorage.getItem('teniko-donate-dismissed')) {
+  document.getElementById('donate-float').style.display = 'none';
+}
+</script>
+<?php endif; ?>
+
+<!-- ── Newsletter AJAX ──────────────────────────────────────── -->
+<script>
+(function(){
+  var f = document.getElementById('footer-newsletter-form');
+  if (!f) return;
+  f.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var fd = new FormData(f);
+    var btn = f.querySelector('button');
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      var r = await fetch('/newsletter/subscribe', {method:'POST', body: fd});
+      var ct = r.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        var d = await r.json();
+        if (d.error) { window.showToast && window.showToast(d.error, 'error'); }
+        else { f.reset(); window.showToast && window.showToast('Subscribed! Thank you.', 'success'); }
+      } else {
+        // Server redirected — check for flash via short poll
+        f.reset();
+        window.showToast && window.showToast('Subscribed! Thank you.', 'success');
+      }
+    } catch(err) {
+      window.showToast && window.showToast('Error. Please try again.', 'error');
+    }
+    btn.disabled = false; btn.textContent = 'Subscribe';
+  });
+})();
+</script>
 
 <!-- ── Scripts ────────────────────────────────────────────── -->
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
