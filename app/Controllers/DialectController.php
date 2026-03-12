@@ -1,38 +1,36 @@
 <?php
 declare(strict_types=1);
-namespace App\Controllers;
+namespace App\Models;
 
-use App\Core\Controller;
-use App\Core\Request;
-use App\Models\Dialect;
+use App\Core\Model;
 
-class DialectController extends Controller
+class Dialect extends Model
 {
-    public function index(Request $request): void
+    protected string $table = 'dialects';
+    protected bool $softDelete = false;
+
+    public function all(string $orderBy = 'name ASC', int $limit = 100): array
     {
-        $model   = new Dialect();
-        $dialects = $model->all();
-        $this->render('dialects/index', [
-            'dialects'  => $dialects,
-            'pageTitle' => 'Dialect Map — Malagasy Dialects | TENIKO',
-            'metaDesc'  => 'Explore the regional dialects of Madagascar with word variations and linguistic descriptions.',
-        ]);
+        return $this->db->fetchAll("SELECT * FROM dialects ORDER BY {$orderBy} LIMIT {$limit}");
     }
 
-    public function show(Request $request): void
+    public function findByCode(string $code): ?array
     {
-        $slug  = $request->param('slug');
-        $model = new Dialect();
+        return $this->db->fetch("SELECT * FROM dialects WHERE code = ?", [$code]);
+    }
 
-        // Find dialect by code (slug)
-        $dialect = $model->findByCode($slug);
-        if (!$dialect) { $this->abort(404, 'Dialect not found.'); return; }
-
-        $full = $model->getWithWords((int)$dialect['id']);  // PDO returns strings; cast to int
-        $this->render('dialects/show', [
-            'dialect'   => $full ?? $dialect,
-            'pageTitle' => e($dialect['name'] ?? 'Dialect') . ' — TENIKO',
-            'metaDesc'  => $dialect['description'] ?? "Explore the {$dialect['name']} dialect of Malagasy.",
-        ]);
+    public function getWithWords(int $dialectId, int $limit = 30): ?array
+    {
+        $dialectId = (int)$dialectId; // ensure int even if called with string from PDO
+        $dialect = $this->find($dialectId);
+        if (!$dialect) return null;
+        $dialect['word_variants'] = $this->db->fetchAll(
+            "SELECT wdv.*, w.word AS standard_word, w.slug AS word_slug
+             FROM word_dialect_variants wdv
+             JOIN words w ON w.id = wdv.word_id
+             WHERE wdv.dialect_id = ? AND w.status = 'published'
+             ORDER BY w.word ASC LIMIT ?", [$dialectId, $limit]
+        );
+        return $dialect;
     }
 }
