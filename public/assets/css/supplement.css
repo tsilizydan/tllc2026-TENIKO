@@ -1,0 +1,236 @@
+/* ============================================================
+   TENIKO — Supplement CSS
+   Additional styles: CTA sections, donate float, dark mode fixes
+   ============================================================ */
+
+/* ── SECTION--CTA (works in both light and dark mode) ────────── */
+.section--cta {
+  background: var(--clr-primary-dk);
+  color: white;
+}
+.section--cta__heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  color: white;
+  margin-bottom: 1rem;
+}
+.section--cta__text {
+  color: rgba(255,255,255,.82);
+  font-size: 1.05rem;
+  max-width: 540px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+.section--cta__outline {
+  border-color: rgba(255,255,255,.4) !important;
+  color: white !important;
+}
+.section--cta__outline:hover {
+  background: rgba(255,255,255,.14) !important;
+  border-color: white !important;
+}
+[data-theme="dark"] .section--cta { background: #0e1f10; }
+
+/* ── DONATION FLOATING WIDGET ─────────────────────────────────── */
+.donate-float {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1500;
+  width: 280px;
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: 1.25rem;
+  animation: slideUp .4s ease;
+}
+.donate-float__close {
+  position: absolute;
+  top: .625rem;
+  right: .625rem;
+  background: none;
+  border: none;
+  color: var(--clr-text-muted);
+  cursor: pointer;
+  font-size: .875rem;
+  padding: .25rem .375rem;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+  line-height: 1;
+}
+.donate-float__close:hover { color: var(--clr-text); }
+.donate-float__icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(200,16,46,.1);
+  color: var(--clr-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: .75rem;
+}
+.donate-float__title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--clr-text);
+  margin-bottom: .375rem;
+  font-weight: 700;
+}
+.donate-float__msg {
+  font-size: .8125rem;
+  color: var(--clr-text-muted);
+  line-height: 1.5;
+  margin-bottom: .75rem;
+}
+.donate-float__progress { margin-bottom: .75rem; }
+.donate-float__bar {
+  height: 6px;
+  background: var(--clr-gray-200);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: .375rem;
+}
+.donate-float__bar > div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--clr-primary), #43a047);
+  border-radius: 100px;
+  transition: width .6s ease;
+}
+.donate-float__progress > span {
+  font-size: .75rem;
+  color: var(--clr-text-muted);
+  display: block;
+}
+@media (max-width: 480px) {
+  .donate-float {
+    width: calc(100vw - 2rem);
+    right: 1rem;
+    bottom: 1rem;
+  }
+}
+
+/* ── FLASH BAR ────────────────────────────────────────────────── */
+.flash-bar { padding-top: 1rem; }
+.flash-bar .alert:last-child { margin-bottom: 0; }
+
+/* Dark mode alert visibility */
+[data-theme="dark"] .alert-success { background: rgba(46,125,50,.15);  color: #81c784; border-color: rgba(46,125,50,.25); }
+[data-theme="dark"] .alert-error   { background: rgba(200,16,46,.15);  color: #ef9a9a; border-color: rgba(200,16,46,.25); }
+[data-theme="dark"] .alert-info    { background: rgba(2,119,189,.15);  color: #80cbc4; border-color: rgba(2,119,189,.25); }
+[data-theme="dark"] .alert-warning { background: rgba(245,127,23,.15); color: #ffcc80; border-color: rgba(245,127,23,.25); }
+
+/* ── DARK MODE FOOTER FIX ─────────────────────────────────────── */
+/* Footer's background was using --clr-charcoal which flips to a
+   light colour in dark mode. Lock it to always be dark: */
+.footer {
+  background: #1c2230 !important;
+}
+[data-theme="dark"] .footer { background: #0d1014 !important; }
+[data-theme="dark"] .footer__heading { color: #81c784; }
+[data-theme="dark"] .footer__link { color: rgba(255,255,255,.55); }
+[data-theme="dark"] .footer__link:hover { color: #81c784; }
+
+/* ── DARK MODE — section-title + beige section ────────────────── */
+[data-theme="dark"] .section-title { color: var(--clr-text); }
+[data-theme="dark"] .section--beige { background: rgba(255,255,255,.03); }
+
+/* ── BADGE component ─────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .375rem;
+  padding: .25rem .75rem;
+  border-radius: var(--radius-full);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+.badge-beige {
+  background: rgba(245,230,200,.3);
+  color: var(--clr-brown);
+  border: 1px solid rgba(122,79,44,.2);
+}
+.badge-green { background: rgba(46,125,50,.12); color: var(--clr-primary); }
+.badge-red   { background: rgba(200,16,46,.12); color: var(--clr-accent); }
+[data-theme="dark"] .badge-beige {
+  background: rgba(200,168,128,.08);
+  color: var(--clr-brown);
+  border-color: rgba(200,168,128,.15);
+}
+
+/* ── btn-rounded ─────────────────────────────────────────────── */
+.btn-rounded { border-radius: var(--radius-full) !important; }
+
+/* ── Password toggle — guarantee eye stays right-aligned ─────── */
+.pwd-field {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+.pwd-field .form-control {
+  padding-right: 3rem !important;
+  flex: 1;
+}
+.pwd-toggle {
+  position: absolute !important;
+  right: .5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--clr-text-muted);
+  padding: .375rem;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+.pwd-toggle:hover { color: var(--clr-primary); }
+
+/* ── Nav mobile: collapse auth buttons, keep theme + notif ───── */
+@media (max-width: 1024px) {
+  .nav__login-btn,
+  .nav__register-btn,
+  .nav__admin-btn,
+  .nav__logout-btn { display: none !important; }
+  .nav__username    { display: none !important; }
+}
+@media (max-width: 640px) {
+  .nav__actions > .btn-ghost:not([id="notif-btn"]):not([onclick*="toggleTheme"]) { display: none !important; }
+}
+
+/* ── Responsive two-col layouts ──────────────────────────────── */
+@media (max-width: 768px) {
+  div[style*="grid-template-columns:1fr 320px"],
+  div[style*="grid-template-columns: 1fr 320px"] {
+    display: block !important;
+  }
+  div[style*="grid-template-columns:1fr 320px"] > aside,
+  div[style*="grid-template-columns: 1fr 320px"] > aside {
+    margin-top: 2rem;
+  }
+}
+
+/* ── Donation CTA strips across pages ────────────────────────── */
+.donate-strip {
+  background: linear-gradient(135deg, rgba(200,16,46,.08), rgba(46,125,50,.08));
+  border: 1px solid rgba(200,16,46,.15);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+.donate-strip__icon { color: var(--clr-accent); font-size: 1.5rem; flex-shrink: 0; }
+.donate-strip__text { flex: 1; min-width: 200px; }
+.donate-strip__text strong { display: block; margin-bottom: .25rem; }
