@@ -63,3 +63,15 @@ $items   = $paged['items'] ?? [];
     <?php endif; ?>
   </div>
 </section>
+
+<!-- Donate CTA strip -->
+<div class="container" style="padding-bottom:3rem">
+  <div class="donate-strip">
+    <div class="donate-strip__icon"><i class="fa fa-heart"></i></div>
+    <div class="donate-strip__text">
+      <strong>Enjoyed these proverbs? Help us preserve more.</strong>
+      TENIKO is a non-profit project. Your donation keeps the archive alive and growing.
+    </div>
+    <a href="/donate" class="btn btn-primary btn-sm">Donate Now</a>
+  </div>
+</div>
