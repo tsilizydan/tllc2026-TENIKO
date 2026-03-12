@@ -166,36 +166,40 @@ $csrfToken = \App\Core\CSRF::generate();
 
 <!-- ── Donation Campaign ──────────────────────────────── -->
 <?php if (!empty($campaign)): ?>
-<section class="section" aria-label="Support TENIKO">
+<section class="section section--cta" aria-label="Support TENIKO">
   <div class="container container-narrow">
     <div class="donation-card">
       <div class="badge badge-beige" style="margin-bottom:1rem;width:fit-content"><i class="fa fa-heart"></i> Support TENIKO</div>
-      <h2 style="font-size:1.75rem;margin-bottom:.75rem"><?= e($campaign['title']) ?></h2>
-      <?php if ($campaign['description']): ?><p style="opacity:.85;margin-bottom:1.5rem"><?= e($campaign['description']) ?></p><?php endif; ?>
-      <?php $pct = $campaign['goal'] > 0 ? min(100, round($campaign['raised'] / $campaign['goal'] * 100)) : 0; ?>
+      <h2 style="font-size:1.75rem;margin-bottom:.75rem"><?= e($campaign['title'] ?? 'Help Us Grow') ?></h2>
+      <?php if (!empty($campaign['description'])): ?><p style="opacity:.85;margin-bottom:1.5rem"><?= e($campaign['description']) ?></p><?php endif; ?>
+      <?php
+        $raised = (float)($campaign['raised'] ?? 0);
+        $goal   = (float)($campaign['goal'] ?? 0);
+        $pct    = $goal > 0 ? min(100, round($raised / $goal * 100)) : 0;
+      ?>
       <div class="progress-bar" role="progressbar" aria-valuenow="<?= $pct ?>" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar__fill" style="width:<?= $pct ?>%"></div>
       </div>
       <div class="flex-between" style="margin:.5rem 0 1.5rem;font-size:.9rem;opacity:.85">
-        <span><strong>$<?= number_format($campaign['raised'], 2) ?></strong> raised</span>
-        <span>Goal: <strong>$<?= number_format($campaign['goal'], 2) ?></strong></span>
+        <span><strong>€<?= number_format($raised, 2) ?></strong> raised</span>
+        <span>Goal: <strong>€<?= number_format($goal, 2) ?></strong></span>
       </div>
-      <a href="/contact" class="btn btn-primary">Support the Archive <i class="fa fa-heart"></i></a>
+      <a href="/donate" class="btn btn-primary">Donate Now <i class="fa fa-heart"></i></a>
     </div>
   </div>
 </section>
 <?php endif; ?>
 
 <!-- ── Contribute CTA ─────────────────────────────────── -->
-<section class="section section--dark" aria-label="Call to action">
+<section class="section section--cta" aria-label="Call to action">
   <div class="container" style="text-align:center">
-    <h2 style="font-size:2.25rem;color:white;margin-bottom:1rem;font-family:var(--font-heading)">Help Build the Archive</h2>
-    <p style="color:rgba(255,255,255,.75);font-size:1.1rem;max-width:540px;margin:0 auto 2rem">
+    <h2 class="section--cta__heading">Help Build the Archive</h2>
+    <p class="section--cta__text">
       TENIKO grows through community contributions. Add words, proverbs, cultural articles, and audio pronunciations.
     </p>
     <div class="flex flex-wrap" style="gap:1rem;justify-content:center">
-      <a href="/contribute" class="btn btn-primary btn-lg btn-rounded"><i class="fa fa-plus"></i> Contribute a Word</a>
-      <a href="/register"   class="btn btn-outline btn-lg btn-rounded" style="border-color:rgba(255,255,255,.4);color:white"><i class="fa fa-user-plus"></i> Join the Community</a>
+      <a href="/contribute" class="btn btn-primary btn-lg"><i class="fa fa-plus"></i> Contribute a Word</a>
+      <a href="/register"   class="btn btn-outline btn-lg section--cta__outline"><i class="fa fa-user-plus"></i> Join the Community</a>
     </div>
   </div>
 </section>
