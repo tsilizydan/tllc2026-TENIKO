@@ -13,12 +13,12 @@ class Auth
             "SELECT * FROM users WHERE email = ? AND deleted_at IS NULL",
             [$email]
         );
-        if ($user && password_verify($password, $user['password'])) {
-            if ($user['status'] !== 'active') return false;
-            self::login($user);
-            return true;
-        }
-        return false;
+        if (!$user) return false;
+        if (!password_verify($password, $user['password'])) return false;
+        // Accept 'active' or 'pending' users — 'suspended'/'banned' are blocked
+        if (in_array($user['status'], ['suspended', 'banned'])) return false;
+        self::login($user);
+        return true;
     }
 
     public static function login(array $user): void
