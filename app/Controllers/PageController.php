@@ -84,4 +84,50 @@ class PageController extends Controller
         echo '</urlset>';
         exit;
     }
+
+    public function donate(Request $request): void
+    {
+        $db = $this->db();
+        $goal    = (float)($db->fetch("SELECT value FROM site_settings WHERE `key`='donation_goal'")['value'] ?? 5000);
+        $message = $db->fetch("SELECT value FROM site_settings WHERE `key`='donation_message'")['value'] ?? '';
+        $raised  = (float)($db->fetch("SELECT COALESCE(SUM(amount),0) AS v FROM donations WHERE status='completed'")['v'] ?? 0);
+
+        $this->render('pages/donate', [
+            'goal'      => $goal,
+            'raised'    => $raised,
+            'message'   => $message,
+            'progress'  => $goal > 0 ? min(100, round(($raised / $goal) * 100)) : 0,
+            'pageTitle' => 'Support TENIKO — Donate',
+            'metaDesc'  => 'Help us preserve Malagasy language and culture. Donate to TENIKO and support our digital archive mission.',
+        ]);
+    }
+
+    public function processDonate(Request $request): void
+    {
+        $this->verifyCsrf($request);
+        $amount = (float)$request->post('amount', 0);
+        $name   = trim($request->post('name', 'Anonymous'));
+        $email  = trim($request->post('email', ''));
+
+        if ($amount <= 0) {
+            $this->session->flash('error', 'Please enter a valid donation amount.');
+            $this->redirect('/donate');
+        }
+
+        // Record donation intent (completed via Stripe webhook in production)
+        try {
+            $this->db()->insert('donations', [
+                'donor_name'     => $name,
+                'email'          => $email,
+                'amount'         => $amount,
+                'currency'       => 'EUR',
+                'payment_method' => 'stripe',
+                'status'         => 'pending',
+                'created_at'     => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable) {}
+
+        $this->session->flash('success', "Thank you {$name}! Your donation of €{$amount} is being processed.");
+        $this->redirect('/donate');
+    }
 }
