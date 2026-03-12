@@ -1,8 +1,11 @@
 <?php // Dialects Index — variables: $dialects ?>
-<div style="background:var(--clr-bg-surface);border-bottom:1px solid var(--clr-border);padding:2rem 0">
+<div style="background:var(--clr-bg-surface);border-bottom:1px solid var(--clr-border);padding:2.5rem 0">
   <div class="container">
-    <h1 class="section-title">Malagasy Dialects</h1>
-    <p class="text-muted" style="margin-top:.5rem">Madagascar is home to 18 ethnic groups, each with unique dialect variations of the Malagasy language.</p>
+    <h1 class="section-title" style="margin-bottom:.5rem">Malagasy Dialects</h1>
+    <p class="text-muted" style="max-width:600px">
+      Madagascar is home to 18 ethnic groups, each with unique dialect variations of the Malagasy language.
+      Explore each dialect's region, vocabulary, and cultural identity.
+    </p>
   </div>
 </div>
 
@@ -16,13 +19,37 @@
     <?php else: ?>
     <div class="grid grid-3">
       <?php foreach ($dialects as $i => $d): ?>
-      <a href="/dialect/<?= e($d['code']) ?>" class="card dialect-card animate-fade-up" style="animation-delay:<?= $i * .04 ?>s;text-decoration:none" aria-label="<?= e($d['name']) ?> dialect">
+      <?php
+        $dName   = $d['name']        ?? '';
+        $dCode   = $d['code']        ?? '';
+        $dRegion = $d['region']      ?? '';
+        $dDesc   = $d['description'] ?? '';
+        // Map region keywords to flag emojis
+        $emoji = '🗺️';
+        $rLow = strtolower($dRegion);
+        if (str_contains($rLow, 'nord') || str_contains($rLow, 'north'))        $emoji = '🌍';
+        elseif (str_contains($rLow, 'sud') || str_contains($rLow, 'south'))     $emoji = '🌟';
+        elseif (str_contains($rLow, 'est') || str_contains($rLow, 'east'))      $emoji = '🌊';
+        elseif (str_contains($rLow, 'ouest') || str_contains($rLow, 'west'))    $emoji = '⛰️';
+        elseif (str_contains($rLow, 'central') || str_contains($rLow, 'haut')) $emoji = '🏔️';
+        elseif (str_contains($rLow, 'côte') || str_contains($rLow, 'coast'))    $emoji = '🌴';
+      ?>
+      <a href="/dialect/<?= e($dCode) ?>" class="card dialect-card animate-fade-up"
+         style="animation-delay:<?= $i * .06 ?>s;text-decoration:none;display:block"
+         aria-label="<?= e($dName) ?> dialect">
         <div class="card__body">
-          <div style="font-size:2rem;margin-bottom:.75rem"><?= $d['emoji'] ?? '🗺️' ?></div>
-          <h2 style="font-size:1.1rem;font-weight:700;color:var(--clr-primary);margin:0 0 .25rem"><?= e($d['name']) ?></h2>
-          <?php if ($d['region']): ?><div style="font-size:.85rem;color:var(--clr-text-muted);margin-bottom:.5rem"><i class="fa fa-map-marker-alt"></i> <?= e($d['region']) ?></div><?php endif; ?>
-          <?php if ($d['speaker_count']): ?><div style="font-size:.8rem;color:var(--clr-text-muted)"><?= number_format($d['speaker_count']) ?> speakers</div><?php endif; ?>
-          <?php if ($d['description']): ?><p style="font-size:.875rem;color:var(--clr-text-muted);margin:.75rem 0 0;line-height:1.6"><?= e(truncate($d['description'], 100)) ?></p><?php endif; ?>
+          <div style="font-size:2rem;margin-bottom:.75rem"><?= $emoji ?></div>
+          <h2 style="font-size:1.1rem;font-weight:700;color:var(--clr-primary);margin:0 0 .25rem"><?= e($dName) ?></h2>
+          <?php if ($dRegion): ?>
+          <div style="font-size:.85rem;color:var(--clr-text-muted);margin-bottom:.5rem">
+            <i class="fa fa-map-marker-alt"></i> <?= e($dRegion) ?>
+          </div>
+          <?php endif; ?>
+          <?php if ($dDesc): ?>
+          <p style="font-size:.875rem;color:var(--clr-text-muted);margin:.75rem 0 0;line-height:1.6">
+            <?= e(truncate($dDesc, 100)) ?>
+          </p>
+          <?php endif; ?>
         </div>
       </a>
       <?php endforeach; ?>
@@ -30,12 +57,16 @@
     <?php endif; ?>
 
     <!-- Madagascar overview -->
-    <div style="margin-top:3rem;padding:2rem;background:var(--clr-beige);border-radius:var(--radius-xl);">
-      <h2 style="font-size:1.25rem;margin-bottom:1rem"><i class="fa fa-info-circle" style="color:var(--clr-primary)"></i> About Malagasy Dialects</h2>
-      <p style="line-height:1.8;color:var(--clr-charcoal)">
-        The Malagasy language, spoken by the 28 million people of Madagascar, belongs to the Austronesian language family — specifically the Malayo-Polynesian branch.
-        While officially one language, Malagasy has significant regional variations across the island's 18 ethnic groups (<em>foko</em>).
-        The official standard, <strong>Official Malagasy (Merina)</strong>, is based on the dialect of the central highlands.
+    <div style="margin-top:3rem;padding:2rem;background:var(--clr-bg-surface);border:1px solid var(--clr-border);border-radius:var(--radius-xl)">
+      <h2 style="font-size:1.25rem;margin-bottom:1rem">
+        <i class="fa fa-info-circle" style="color:var(--clr-primary)"></i> About Malagasy Dialects
+      </h2>
+      <p style="line-height:1.8;color:var(--clr-text-muted)">
+        The Malagasy language, spoken by the 28 million people of Madagascar, belongs to the Austronesian
+        language family — specifically the Malayo-Polynesian branch. While officially one language, Malagasy
+        has significant regional variations across the island's 18 ethnic groups (<em>foko</em>).
+        The official standard, <strong>Official Malagasy (Merina)</strong>, is based on the dialect of
+        the central highlands.
       </p>
     </div>
   </div>
