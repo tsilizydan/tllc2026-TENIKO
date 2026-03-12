@@ -65,8 +65,10 @@ class CSRF
         $session = new Session();
         $session->start();
         $session->flash('error', 'Your session expired. Please try again.');
+        // Use path from referer, or '/' as fallback — avoid absolute-URL redirect issues
         $referer = $_SERVER['HTTP_REFERER'] ?? '/';
-        header('Location: ' . $referer, true, 303);
+        $path = parse_url($referer, PHP_URL_PATH) ?: '/';
+        header('Location: ' . $path, true, 303);
         exit;
     }
 }
