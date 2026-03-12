@@ -31,7 +31,14 @@ abstract class Controller
 
     protected function redirect(string $path, int $code = 302): never
     {
-        $location = str_starts_with($path, 'http') ? $path : (rtrim(env('APP_URL', ''), '/') . '/' . ltrim($path, '/'));
+        // Use path-relative Location header — works reliably on all hosting setups
+        // If path is already absolute (http/https), use it directly
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            $location = $path;
+        } else {
+            // Ensure path starts with /
+            $location = '/' . ltrim($path, '/');
+        }
         header('Location: ' . $location, true, $code);
         exit;
     }
