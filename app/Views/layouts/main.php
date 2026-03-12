@@ -48,12 +48,12 @@ $authUser    = \App\Core\Auth::user();
   <!-- Animate.css -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <!-- Favicons (SEO + PWA) -->
-  <link rel="icon" type="image/png" href="../public/assets/imgs/favicon/favicon-96x96.png" sizes="96x96">
-  <link rel="icon" type="image/svg+xml" href="../public/assets/imgs/favicon/favicon.svg">
-  <link rel="shortcut icon" href="../public/assets/imgs/favicon/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="../public/assets/imgs/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="../../assets/imgs/favicon/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/svg+xml" href="../../assets/imgs/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../../assets/imgs/favicon/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/imgs/favicon/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="TENIKO">
-  <link rel="manifest" href="../public/assets/imgs/favicon/site.webmanifest">
+  <link rel="manifest" href="../../assets/imgs/favicon/site.webmanifest">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/supplement.css">
