@@ -77,6 +77,7 @@ $authUser    = \App\Core\Auth::user();
       <span><?= e($siteName) ?></span>
     </a>
 
+    <!-- Desktop links — hidden on ≤ 1024px, shown via media query -->
     <div class="nav__links" role="menubar">
       <a href="/"           class="nav__link <?= $currentPath === '/'           ? 'active' : '' ?>" role="menuitem">Home</a>
       <a href="/dictionary" class="nav__link <?= str_starts_with($currentPath, '/dictionary') || str_starts_with($currentPath, '/word') ? 'active' : '' ?>" role="menuitem">Dictionary</a>
@@ -95,29 +96,27 @@ $authUser    = \App\Core\Auth::user();
 
       <?php if ($isLoggedIn): ?>
         <!-- Notifications -->
-        <button class="btn-icon btn-ghost" id="notif-btn" aria-label="Notifications" style="position:relative">
+        <button class="btn-icon btn-ghost nav__notif-btn" id="notif-btn" aria-label="Notifications" style="position:relative">
           <i class="fa fa-bell"></i>
           <span class="notif-badge" style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--clr-accent);border-radius:50%"></span>
         </button>
-        <!-- User menu -->
-        <div style="position:relative">
-          <a href="/profile/<?= e($authUser['username']) ?>" class="btn btn-ghost btn-sm flex" style="gap:.5rem">
-            <span style="width:30px;height:30px;background:var(--clr-primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700">
-              <?= strtoupper(substr($authUser['display_name'] ?? $authUser['username'], 0, 1)) ?>
-            </span>
-            <span><?= e($authUser['display_name'] ?? $authUser['username']) ?></span>
+        <!-- User menu Desktop -->
+        <div class="nav__user-menu" style="position:relative">
+          <a href="/profile/<?= e($authUser['username']) ?>" class="btn btn-ghost btn-sm nav__user-btn" style="gap:.5rem;display:flex;align-items:center;max-width:160px;overflow:hidden">
+            <span class="nav__avatar"><?= strtoupper(substr($authUser['display_name'] ?? $authUser['username'], 0, 1)) ?></span>
+            <span class="nav__username"><?= e($authUser['display_name'] ?? $authUser['username']) ?></span>
           </a>
         </div>
         <?php if ($authUser['role'] === 'admin'): ?>
-          <a href="/admin" class="btn btn-primary btn-sm">Admin</a>
+          <a href="/admin" class="btn btn-primary btn-sm nav__admin-btn">Admin</a>
         <?php endif; ?>
-        <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
+        <a href="/logout" class="btn btn-ghost btn-sm nav__logout-btn">Logout</a>
       <?php else: ?>
-        <a href="/login"    class="btn btn-ghost btn-sm">Login</a>
-        <a href="/register" class="btn btn-primary btn-sm btn-rounded">Join TENIKO</a>
+        <a href="/login"    class="btn btn-ghost btn-sm nav__login-btn">Login</a>
+        <a href="/register" class="btn btn-primary btn-sm btn-rounded nav__register-btn">Join TENIKO</a>
       <?php endif; ?>
 
-      <!-- Mobile hamburger -->
+      <!-- Mobile hamburger — always visible -->
       <button class="nav__burger" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -144,6 +143,7 @@ $authUser    = \App\Core\Auth::user();
         ['/contribute', 'fa-plus-circle', 'Contribute'],
         ['/about', 'fa-info-circle', 'About'],
         ['/contact', 'fa-envelope', 'Contact'],
+        ['/donate', 'fa-heart', 'Donate'],
       ] as [$href, $icon, $label]): ?>
         <a href="<?= $href ?>" style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1.5rem;color:var(--clr-text);font-size:.95rem;transition:background .15s ease" onmouseover="this.style.background='rgba(46,125,50,.06)'" onmouseout="this.style.background=''">
           <i class="fa <?= $icon ?>" style="width:20px;color:var(--clr-primary)"></i><?= $label ?>
@@ -205,6 +205,7 @@ $authUser    = \App\Core\Auth::user();
         <div class="footer__heading">About</div>
         <a href="/about"      class="footer__link">About Us</a>
         <a href="/contact"    class="footer__link">Contact</a>
+        <a href="/donate"     class="footer__link"><i class="fa fa-heart" style="color:var(--clr-accent)"></i> Donate</a>
         <a href="/sitemap.xml" class="footer__link">Sitemap</a>
         <!-- Newsletter mini-form -->
         <div style="margin-top:1rem">
