@@ -1,36 +1,86 @@
 <?php
 declare(strict_types=1);
-namespace App\Models;
+namespace App\Controllers;
 
-use App\Core\Model;
+use App\Core\Controller;
+use App\Core\Request;
+use App\Models\Dialect;
 
-class Dialect extends Model
+class DialectController extends Controller
 {
-    protected string $table = 'dialects';
-    protected bool $softDelete = false;
-
-    public function all(string $orderBy = 'name ASC', int $limit = 100): array
+    private function writeLog(string $msg): void
     {
-        return $this->db->fetchAll("SELECT * FROM dialects ORDER BY {$orderBy} LIMIT {$limit}");
+        $f = dirname(__DIR__, 2) . '/public/teniko-debug.txt';
+        file_put_contents($f, date('[Y-m-d H:i:s] ') . $msg . "\n", FILE_APPEND | LOCK_EX);
     }
 
-    public function findByCode(string $code): ?array
+    public function index(Request $request): void
     {
-        return $this->db->fetch("SELECT * FROM dialects WHERE code = ?", [$code]);
+        $this->writeLog('DialectController::index() called — starting');
+        try {
+            $model    = new Dialect();
+            $this->writeLog('Dialect model created — calling all()');
+            $dialects = $model->all();
+            $this->writeLog('Dialect all() returned ' . count($dialects) . ' rows');
+        } catch (\Throwable $e) {
+            $this->writeLog('[ERROR] ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            $this->writeLog('[TRACE] ' . $e->getTraceAsString());
+            // Also die with plain text to bypass any buffering
+            while (ob_get_level() > 0) ob_end_clean();
+            header('Content-Type: text/plain; charset=UTF-8');
+            die('[DIALECT INDEX ERROR] ' . get_class($e) . ': ' . $e->getMessage() . "\nFile: " . $e->getFile() . ':' . $e->getLine() . "\n\n" . $e->getTraceAsString());
+        }
+
+        $this->writeLog('About to render dialects/index view');
+        try {
+            $this->render('dialects/index', [
+                'dialects'  => $dialects,
+                'pageTitle' => 'Dialect Map — Malagasy Dialects | TENIKO',
+                'metaDesc'  => 'Explore the regional dialects of Madagascar with word variations and linguistic descriptions.',
+            ]);
+            $this->writeLog('render() completed successfully');
+        } catch (\Throwable $e) {
+            $this->writeLog('[RENDER ERROR] ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            $this->writeLog('[TRACE] ' . $e->getTraceAsString());
+            while (ob_get_level() > 0) ob_end_clean();
+            header('Content-Type: text/plain; charset=UTF-8');
+            die('[DIALECT RENDER ERROR] ' . get_class($e) . ': ' . $e->getMessage() . "\nFile: " . $e->getFile() . ':' . $e->getLine() . "\n\n" . $e->getTraceAsString());
+        }
     }
 
-    public function getWithWords(int $dialectId, int $limit = 30): ?array
+    public function show(Request $request): void
     {
-        $dialectId = (int)$dialectId; // ensure int even if called with string from PDO
-        $dialect = $this->find($dialectId);
-        if (!$dialect) return null;
-        $dialect['word_variants'] = $this->db->fetchAll(
-            "SELECT wdv.*, w.word AS standard_word, w.slug AS word_slug
-             FROM word_dialect_variants wdv
-             JOIN words w ON w.id = wdv.word_id
-             WHERE wdv.dialect_id = ? AND w.status = 'published'
-             ORDER BY w.word ASC LIMIT ?", [$dialectId, $limit]
-        );
-        return $dialect;
+        $slug  = $request->param('slug');
+        $model = new Dialect();
+
+        try {
+            $dialect = $model->findByCode($slug);
+        } catch (\Throwable $e) {
+            while (ob_get_level() > 0) ob_end_clean();
+            header('Content-Type: text/plain; charset=UTF-8');
+            die('[DIALECT SHOW findByCode ERROR] ' . get_class($e) . ': ' . $e->getMessage() . "\nFile: " . $e->getFile() . ':' . $e->getLine());
+        }
+
+        if (!$dialect) { $this->abort(404, 'Dialect not found.'); return; }
+
+        try {
+            $full = $model->getWithWords((int)$dialect['id']);
+        } catch (\Throwable $e) {
+            while (ob_get_level() > 0) ob_end_clean();
+            header('Content-Type: text/plain; charset=UTF-8');
+            die('[DIALECT SHOW getWithWords ERROR] ' . get_class($e) . ': ' . $e->getMessage() . "\nFile: " . $e->getFile() . ':' . $e->getLine());
+        }
+
+        try {
+            $this->render('dialects/show', [
+                'dialect'   => $full ?? $dialect,
+                'pageTitle' => e($dialect['name'] ?? 'Dialect') . ' — TENIKO',
+                'metaDesc'  => $dialect['description'] ?? "Explore the {$dialect['name']} dialect of Malagasy.",
+            ]);
+        } catch (\Throwable $e) {
+            while (ob_get_level() > 0) ob_end_clean();
+            header('Content-Type: text/plain; charset=UTF-8');
+            die('[DIALECT SHOW RENDER ERROR] ' . get_class($e) . ': ' . $e->getMessage() . "\nFile: " . $e->getFile() . ':' . $e->getLine() . "\n\n" . $e->getTraceAsString());
+        }
     }
 }
