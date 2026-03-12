@@ -28,10 +28,10 @@ class DialectController extends Controller
         $dialect = $model->findByCode($slug);
         if (!$dialect) { $this->abort(404, 'Dialect not found.'); return; }
 
-        $full = $model->getWithWords($dialect['id']);
+        $full = $model->getWithWords((int)$dialect['id']);  // PDO returns strings; cast to int
         $this->render('dialects/show', [
-            'dialect'   => $full,
-            'pageTitle' => e($dialect['name']) . ' Dialect — TENIKO',
+            'dialect'   => $full ?? $dialect,
+            'pageTitle' => e($dialect['name'] ?? 'Dialect') . ' — TENIKO',
             'metaDesc'  => $dialect['description'] ?? "Explore the {$dialect['name']} dialect of Malagasy.",
         ]);
     }
