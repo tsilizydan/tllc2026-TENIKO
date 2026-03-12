@@ -24,7 +24,13 @@ class Auth
     public static function login(array $user): void
     {
         $session = new Session();
+        $session->start();
+        // Preserve CSRF token before session ID regeneration
+        $csrfToken = $session->get('_csrf_token');
         $session->regenerate();
+        if ($csrfToken) {
+            $session->set('_csrf_token', $csrfToken);
+        }
         $session->set('user_id', $user['id']);
         $session->set('user_role', $user['role']);
         self::$user = $user;
