@@ -71,13 +71,15 @@ class Router
 
                 $controllerClass = 'App\\Controllers\\' . $route['controller'];
                 if (!class_exists($controllerClass)) {
-                    $this->abort(500, "Controller {$controllerClass} not found.");
+                    error_log('[TENIKO ROUTER] Controller not found: ' . $controllerClass);
+                    $this->abort(500, "Controller not found: {$controllerClass}");
                     return;
                 }
                 $controller = new $controllerClass();
                 $action = $route['action'];
                 if (!method_exists($controller, $action)) {
-                    $this->abort(500, "Method {$action} not found in {$controllerClass}.");
+                    error_log('[TENIKO ROUTER] Method not found: ' . $action . ' in ' . $controllerClass);
+                    $this->abort(500, "Method {$action} not found.");
                     return;
                 }
                 $controller->$action($request);
