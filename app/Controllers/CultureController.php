@@ -11,16 +11,62 @@ class CultureController extends Controller
     public function index(Request $request): void
     {
         $model      = new Article();
-        $categories = $this->db()->fetchAll("SELECT * FROM categories WHERE type IN ('article','cultural') ORDER BY sort_order");
-        $featured   = $model->featured(6);
-        $latest     = $model->latest(12);
+        $db         = $this->db();
+
+        // Fetch categories for filter tabs
+        $categories = $db->fetchAll(
+            "SELECT * FROM categories WHERE type IN ('article','cultural') ORDER BY sort_order"
+        );
+
+        // Get active category filter from query string
+        $categoryId = $request->get('category') ? (int)$request->get('category') : null;
+        $page       = max(1, (int)$request->get('page', 1));
+        $perPage    = 12;
+        $offset     = ($page - 1) * $perPage;
+
+        // Build query based on filter
+        if ($categoryId) {
+            $total = $db->count(
+                "SELECT COUNT(*) FROM articles WHERE status='published' AND deleted_at IS NULL AND category_id=?",
+                [$categoryId]
+            );
+            $items = $db->fetchAll(
+                "SELECT a.*, c.name AS category_name FROM articles a
+                 LEFT JOIN categories c ON c.id = a.category_id
+                 WHERE a.status='published' AND a.deleted_at IS NULL AND a.category_id=?
+                 ORDER BY a.published_at DESC LIMIT ? OFFSET ?",
+                [$categoryId, $perPage, $offset]
+            );
+        } else {
+            $total = $db->count(
+                "SELECT COUNT(*) FROM articles WHERE status='published' AND deleted_at IS NULL"
+            );
+            $items = $db->fetchAll(
+                "SELECT a.*, c.name AS category_name FROM articles a
+                 LEFT JOIN categories c ON c.id = a.category_id
+                 WHERE a.status='published' AND a.deleted_at IS NULL
+                 ORDER BY a.published_at DESC LIMIT ? OFFSET ?",
+                [$perPage, $offset]
+            );
+        }
+
+        $lastPage = max(1, (int)ceil($total / $perPage));
+
+        // Featured (top 4)
+        $featured = $model->featured(4);
 
         $this->render('culture/index', [
-            'categories' => $categories,
-            'featured'   => $featured,
-            'latest'     => $latest,
-            'pageTitle'  => 'Culture & Knowledge — TENIKO',
-            'metaDesc'   => 'Explore Malagasy culture, traditions, folklore, history, and linguistics.',
+            'categories'  => $categories,
+            'category'    => $categoryId,
+            'featured'    => $featured,
+            'articles'    => [
+                'items'        => $items,
+                'total'        => $total,
+                'current_page' => $page,
+                'last_page'    => $lastPage,
+            ],
+            'pageTitle'   => 'Culture & Knowledge — TENIKO',
+            'metaDesc'    => 'Explore Malagasy culture, traditions, folklore, history, and linguistics.',
         ]);
     }
 
