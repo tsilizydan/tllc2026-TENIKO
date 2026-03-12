@@ -13,7 +13,7 @@ class CSRF
         if (!$session->has(self::TOKEN_KEY)) {
             $session->set(self::TOKEN_KEY, bin2hex(random_bytes(32)));
         }
-        return $session->get(self::TOKEN_KEY);
+        return (string)$session->get(self::TOKEN_KEY);
     }
 
     public static function validate(?string $token): bool
@@ -23,7 +23,7 @@ class CSRF
         $session->start();
         $stored = $session->get(self::TOKEN_KEY);
         if (!$stored) return false;
-        return hash_equals($stored, $token);
+        return hash_equals((string)$stored, $token);
     }
 
     public static function field(): string
@@ -32,14 +32,41 @@ class CSRF
         return '<input type="hidden" name="_csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES) . '">';
     }
 
+    /**
+     * Verify CSRF for POST/PUT/PATCH/DELETE requests.
+     * For AJAX requests: returns JSON 419.
+     * For normal form submissions: flashes an error and redirects back.
+     */
     public static function verify(Request $request): void
     {
-        if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-            $token = $request->post('_csrf_token') ?? $request->header('X-CSRF-Token');
-            if (!self::validate($token)) {
-                http_response_code(419);
-                die(json_encode(['error' => 'CSRF token mismatch.']));
-            }
+        if (!in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
+            return;
         }
+        $token = $request->post('_csrf_token')
+              ?? $request->header('X-CSRF-Token')
+              ?? $request->header('X-Csrf-Token');
+
+        if (self::validate($token)) {
+            return; // Valid — proceed
+        }
+
+        // Determine if AJAX / JSON request
+        $acceptsJson = str_contains($request->header('Accept') ?? '', 'application/json');
+        $isXhr       = strtolower($request->header('X-Requested-With') ?? '') === 'xmlhttprequest';
+
+        if ($isXhr || $acceptsJson) {
+            http_response_code(419);
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode(['error' => 'CSRF token mismatch. Please refresh and try again.']);
+            exit;
+        }
+
+        // Normal form: flash and redirect back
+        $session = new Session();
+        $session->start();
+        $session->flash('error', 'Your session expired. Please try again.');
+        $referer = $_SERVER['HTTP_REFERER'] ?? '/';
+        header('Location: ' . $referer, true, 303);
+        exit;
     }
 }
