@@ -40,3 +40,15 @@
     </div>
   </div>
 </section>
+
+<!-- Donate CTA strip -->
+<div class="container" style="padding-bottom:3rem">
+  <div class="donate-strip">
+    <div class="donate-strip__icon"><i class="fa fa-globe"></i></div>
+    <div class="donate-strip__text">
+      <strong>Help us map every Malagasy dialect.</strong>
+      Support our mission to document, preserve, and share every regional variation of Malagasy.
+    </div>
+    <a href="/donate" class="btn btn-primary btn-sm">Donate</a>
+  </div>
+</div>
