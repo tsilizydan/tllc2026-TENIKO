@@ -46,8 +46,21 @@ class HomeController extends Controller
 
     public function newsletter(Request $request): void
     {
+        $this->verifyCsrf($request);
         $email = trim($request->post('email', ''));
+        $isAjax = strtolower($request->header('X-Requested-With') ?? '') === 'xmlhttprequest'
+                  || str_contains($request->header('Accept') ?? '', 'application/json');
+
+        $jsonReply = function(bool $ok, string $msg) use ($isAjax): void {
+            if ($isAjax) {
+                header('Content-Type: application/json; charset=UTF-8');
+                echo json_encode($ok ? ['success' => true, 'message' => $msg] : ['error' => $msg]);
+                exit;
+            }
+        };
+
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $jsonReply(false, 'Please enter a valid email address.');
             $this->session->flash('error', 'Please enter a valid email address.');
             $this->redirect('/');
         }
@@ -59,8 +72,10 @@ class HomeController extends Controller
                 'token'      => bin2hex(random_bytes(16)),
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
+            $jsonReply(true, 'Thank you for subscribing to TENIKO newsletter!');
             $this->session->flash('success', 'Thank you for subscribing to TENIKO newsletter!');
         } else {
+            $jsonReply(true, 'You are already subscribed.');
             $this->session->flash('info', 'You are already subscribed.');
         }
         $this->redirect('/');
