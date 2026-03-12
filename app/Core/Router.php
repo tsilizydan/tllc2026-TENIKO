@@ -103,11 +103,13 @@ class Router
     private function abort(int $code, string $message): void
     {
         http_response_code($code);
-        $view = new View();
-        if ($code === 404) {
-            $view->render('errors/404', ['message' => $message]);
-        } else {
-            $view->render('errors/500', ['message' => $message]);
+        try {
+            $view = new View();
+            $view->render('errors/error', ['code' => $code, 'message' => $message]);
+        } catch (\Throwable $e) {
+            // Fallback if even the error view fails
+            echo '<h1>' . $code . ' — ' . htmlspecialchars($message) . '</h1>';
+            echo '<p><a href="/">Go Home</a></p>';
         }
     }
 }
