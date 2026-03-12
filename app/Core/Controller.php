@@ -39,7 +39,12 @@ abstract class Controller
     protected function abort(int $code = 404, string $message = ''): void
     {
         http_response_code($code);
-        $this->render('errors/error', ['code' => $code, 'message' => $message]);
+        try {
+            $this->render('errors/error', ['code' => $code, 'message' => $message]);
+        } catch (\Throwable) {
+            echo '<h1>' . $code . ' — ' . htmlspecialchars($message ?: 'Error') . '</h1>';
+            echo '<p><a href="/">Go Home</a></p>';
+        }
         exit;
     }
 
