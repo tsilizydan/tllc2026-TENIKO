@@ -60,8 +60,9 @@ class Auth
         $userId = $session->get('user_id');
         if (!$userId) return null;
         $db = Database::getInstance();
+        // Accept active and pending users (suspended/banned are excluded)
         self::$user = $db->fetch(
-            "SELECT * FROM users WHERE id = ? AND status = 'active' AND deleted_at IS NULL",
+            "SELECT * FROM users WHERE id = ? AND status IN ('active','pending') AND deleted_at IS NULL",
             [$userId]
         ) ?: null;
         return self::$user;
