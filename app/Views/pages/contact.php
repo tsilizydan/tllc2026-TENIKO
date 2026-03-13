@@ -11,6 +11,12 @@ $csrfToken = \App\Core\CSRF::generate();
 <section class="section" style="padding-top:2rem">
   <div class="container" style="display:grid;grid-template-columns:1fr 320px;gap:3rem;align-items:start">
     <div>
+      <?php if (!empty($flash_success)): ?>
+        <div class="alert alert-success" style="margin-bottom:1.5rem"><i class="fa fa-check-circle"></i> <?= e($flash_success) ?></div>
+      <?php endif; ?>
+      <?php if (!empty($flash_error)): ?>
+        <div class="alert alert-error" style="margin-bottom:1.5rem;background:#fef2f2;color:#991b1b;padding:1rem;border-radius:4px"><i class="fa fa-exclamation-circle"></i> <?= e($flash_error) ?></div>
+      <?php endif; ?>
       <form action="/contact" method="POST" novalidate>
         <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
