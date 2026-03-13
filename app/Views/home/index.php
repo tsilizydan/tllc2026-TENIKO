@@ -2,17 +2,23 @@
 /**
  * Homepage — TENIKO
  * Available: $wordOfDay, $proverbOfDay, $featured, $latestWords, $announcements, $campaign
+ * Settings keys read from site_settings via $settings[].
  */
 $csrfToken = \App\Core\CSRF::generate();
+// Load site settings for CMS-controlled homepage text
+$_db = \App\Core\Database::getInstance();
+$_sr = $_db->fetchAll("SELECT `key`, value FROM site_settings WHERE `group` IN ('homepage','general')");
+$_s  = [];
+foreach ($_sr as $_row) $_s[$_row['key']] = $_row['value'];
 ?>
 <!-- ── Hero ─────────────────────────────────────────────── -->
 <section class="hero" aria-labelledby="hero-title">
   <div class="container">
     <p class="hero__subtitle animate__animated animate__fadeInDown" style="animation-delay:.1s">
-      <em>Teny</em> — The Living Archive of Malagasy Language & Culture
+      <?= e($_s['homepage_hero_subtitle'] ?? 'Teny — The Living Archive of Malagasy Language & Culture') ?>
     </p>
     <h1 class="hero__title animate__animated animate__fadeIn" id="hero-title">
-      Discover the Malagasy Language
+      <?= e($_s['homepage_hero_title'] ?? 'Discover the Malagasy Language') ?>
     </h1>
 
     <!-- Search Bar -->
@@ -36,10 +42,11 @@ $csrfToken = \App\Core\CSRF::generate();
       $wordCount       = $db->count("SELECT COUNT(*) FROM words WHERE status='published'");
       $proverbCount    = $db->count("SELECT COUNT(*) FROM proverbs WHERE status='published'");
       $contributorCount= $db->count("SELECT COUNT(*) FROM users WHERE status='active'");
+      $dialectCount = $db->count("SELECT COUNT(*) FROM dialects");
       foreach ([
         [$wordCount,        'Words',        'fa-book'],
         [$proverbCount,     'Proverbs',     'fa-scroll'],
-        [8,                 'Dialects',     'fa-map'],
+        [$dialectCount,     'Dialects',     'fa-map'],
         [$contributorCount, 'Contributors', 'fa-users'],
       ] as [$n, $label, $icon]): ?>
         <div class="flex" style="align-items:center;gap:.75rem;color:rgba(255,255,255,.9)" aria-label="<?= e($n) ?> <?= $label ?>">
@@ -111,7 +118,7 @@ $csrfToken = \App\Core\CSRF::generate();
   <div class="container">
     <div class="section__header flex-between">
       <div>
-        <h2 class="section-title" id="featured-title">Cultural Knowledge</h2>
+        <h2 class="section-title" id="featured-title"><?= e($_s['homepage_featured_title'] ?? 'Cultural Knowledge') ?></h2>
         <p class="text-muted" style="margin-top:.5rem">Explore Malagasy traditions, history, and linguistic research</p>
       </div>
       <a href="/culture" class="btn btn-outline">View All <i class="fa fa-arrow-right"></i></a>
@@ -146,7 +153,7 @@ $csrfToken = \App\Core\CSRF::generate();
   <div class="container">
     <div class="section__header flex-between">
       <div>
-        <h2 class="section-title" id="latest-words-title">Latest Words Added</h2>
+        <h2 class="section-title" id="latest-words-title"><?= e($_s['homepage_words_title'] ?? 'Latest Words Added') ?></h2>
         <p class="text-muted" style="margin-top:.5rem">Recently contributed to the Malagasy dictionary</p>
       </div>
       <a href="/dictionary" class="btn btn-outline">Browse All <i class="fa fa-arrow-right"></i></a>
@@ -193,10 +200,8 @@ $csrfToken = \App\Core\CSRF::generate();
 <!-- ── Contribute CTA ─────────────────────────────────── -->
 <section class="section section--cta" aria-label="Call to action">
   <div class="container" style="text-align:center">
-    <h2 class="section--cta__heading">Help Build the Archive</h2>
-    <p class="section--cta__text">
-      TENIKO grows through community contributions. Add words, proverbs, cultural articles, and audio pronunciations.
-    </p>
+    <h2 class="section--cta__heading"><?= e($_s['homepage_cta_title'] ?? 'Help Build the Archive') ?></h2>
+    <p class="section--cta__text"><?= e($_s['homepage_cta_text'] ?? 'TENIKO grows through community contributions. Add words, proverbs, cultural articles, and audio pronunciations.') ?></p>
     <div class="flex flex-wrap" style="gap:1rem;justify-content:center">
       <a href="/contribute" class="btn btn-primary btn-lg"><i class="fa fa-plus"></i> Contribute a Word</a>
       <a href="/register"   class="btn btn-outline btn-lg section--cta__outline"><i class="fa fa-user-plus"></i> Join the Community</a>
