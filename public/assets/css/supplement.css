@@ -1,7 +1,124 @@
 /* ============================================================
-   TENIKO — Supplement CSS
-   Additional styles: CTA sections, donate float, dark mode fixes
+   TENIKO — Supplement CSS  v2.0
+   Docy-inspired components, Namecheap-hosted, brand-aligned
+   Additional: Section dividers, stat strip, elevated cards,
+               dark-mode fixes, flash bar, donation widget
    ============================================================ */
+
+/* ── SECTION EYEBROW LABEL ────────────────────────────────────── */
+/* Small pill label above section headings, like Docy uses */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .375rem;
+  padding: .3rem .875rem;
+  background: rgba(46,125,50,.1);
+  color: var(--clr-primary);
+  border-radius: var(--radius-full);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  margin-bottom: .875rem;
+}
+[data-theme="dark"] .section-eyebrow {
+  background: rgba(76,175,80,.15);
+}
+
+/* ── SECTION TITLE REFINEMENTS ────────────────────────────────── */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+  color: var(--clr-text);
+  line-height: 1.2;
+  margin-bottom: .5rem;
+  letter-spacing: -.02em;
+}
+.section-subtitle {
+  font-size: 1.05rem;
+  color: var(--clr-text-muted);
+  max-width: 560px;
+  line-height: 1.7;
+}
+.section-header { margin-bottom: var(--sp-10); }
+.section-header.centered { text-align: center; }
+.section-header.centered .section-subtitle { margin: 0 auto; }
+
+/* ── SECTION WAVE SEPARATOR ───────────────────────────────────── */
+/* Add class to any section container to get a wave bottom */
+.section-wave-bottom {
+  position: relative;
+}
+.section-wave-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: var(--clr-bg);
+  clip-path: ellipse(52% 100% at 50% 100%);
+  pointer-events: none;
+}
+
+/* ── STAT COUNTER STRIP ────────────────────────────────────────── */
+/* Docy-style horizontal stat counters */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--clr-border);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.stat-strip__item {
+  background: var(--clr-bg-card);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  transition: background .2s;
+}
+.stat-strip__item:hover { background: var(--clr-bg-surface); }
+.stat-strip__number {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--clr-primary);
+  line-height: 1;
+  margin-bottom: .25rem;
+}
+.stat-strip__label {
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* ── WORD CARD ELEVATION ──────────────────────────────────────── */
+.word-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-5);
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.word-card:hover {
+  border-color: rgba(46,125,50,.22);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+.word-card__word { font-family: var(--font-heading); font-size: var(--fs-xl); font-weight: 700; color: var(--clr-primary); }
+.word-card__pos  { font-size: var(--fs-xs); color: var(--clr-text-muted); font-style: italic; }
+.word-card__def  { font-size: var(--fs-sm); color: var(--clr-text-muted); line-height: 1.55; }
+
+
 
 /* ── SECTION--CTA (works in both light and dark mode) ────────── */
 .section--cta {
