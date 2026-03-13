@@ -12,20 +12,34 @@ class SettingsController extends Controller
     {
         $this->requireAdmin();
         $model    = new SiteSetting();
-        $settings = $model->allGrouped();
-        $this->render('admin/settings', ['settings' => $settings, 'pageTitle' => 'Settings — TENIKO Admin'], 'admin');
+        // Use allFlat() — returns simple key→value array the view expects
+        $settings = $model->allFlat();
+        $this->render('admin/settings', [
+            'settings'  => $settings,
+            'pageTitle' => 'Settings — TENIKO Admin',
+        ], 'admin');
     }
 
     public function update(Request $request): void
     {
         $this->requireAdmin();
         $this->verifyCsrf($request);
+
         $model    = new SiteSetting();
         $incoming = $request->post('settings', []);
-        foreach ($incoming as $key => $value) {
-            $model->set($key, $value);
+
+        if (!is_array($incoming)) {
+            $this->session->flash('error', 'Invalid settings data.');
+            $this->redirect('/admin/settings');
         }
-        $this->cache->flush(); // Clear all cached settings
+
+        foreach ($incoming as $key => $value) {
+            // Sanitize key — only allow alphanumeric + underscore
+            $key = preg_replace('/[^a-z0-9_]/', '', strtolower((string)$key));
+            if ($key === '') continue;
+            $model->set($key, trim((string)$value));
+        }
+
         $this->session->flash('success', 'Settings saved successfully.');
         $this->redirect('/admin/settings');
     }
