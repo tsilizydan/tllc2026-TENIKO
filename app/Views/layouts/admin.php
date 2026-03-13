@@ -50,6 +50,7 @@ $navItems = [
 <body class="admin-body">
 
 <!-- ── Sidebar ──────────────────────────────────────────── -->
+<div class="admin-sidebar-overlay" id="sidebar-overlay"></div>
 <aside class="admin-sidebar" id="admin-sidebar" role="navigation" aria-label="Admin navigation">
   <a href="/admin" class="admin-sidebar__brand">
     <img src="/assets/imgs/teniko2.png" alt="TENIKO" width="28" height="28" style="object-fit:contain;border-radius:4px;flex-shrink:0;">
@@ -123,6 +124,11 @@ $navItems = [
   // Sidebar toggle for mobile
   document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
     document.getElementById('admin-sidebar')?.classList.toggle('open');
+    document.getElementById('sidebar-overlay')?.classList.toggle('open');
+  });
+  document.getElementById('sidebar-overlay')?.addEventListener('click', () => {
+    document.getElementById('admin-sidebar')?.classList.remove('open');
+    document.getElementById('sidebar-overlay')?.classList.remove('open');
   });
   // Theme icon sync
   const theme = document.documentElement.getAttribute('data-theme');
