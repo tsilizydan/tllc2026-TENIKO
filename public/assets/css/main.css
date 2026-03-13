@@ -97,6 +97,15 @@
   --clr-text-muted:  #9a9fb0;
   --clr-border:      #2e3240;
   --clr-beige:       #2a2410;
+  --clr-gray-50:     #1a1d21;
+  --clr-gray-100:    #22262b;
+  --clr-gray-200:    #2e3240;
+  --clr-gray-300:    #3f4455;
+  --clr-gray-400:    #5c637a;
+  --clr-gray-500:    #7b829e;
+  --clr-gray-600:    #9a9fb0;
+  --clr-gray-700:    #b9bcc8;
+  --clr-gray-800:    #d8dadd;
   --shadow-md:       0 4px 16px rgba(0,0,0,.35);
   --shadow-lg:       0 12px 40px rgba(0,0,0,.45);
 }
@@ -262,6 +271,7 @@ p { margin-bottom: var(--sp-4); color: var(--clr-text); }
   gap: var(--sp-2);
   flex-shrink: 0;          /* NEVER shrink — always visible */
   min-width: 0;
+  margin-left: auto;
 }
 
 /* Avatar circle in nav */
@@ -617,10 +627,19 @@ p { margin-bottom: var(--sp-4); color: var(--clr-text); }
 .icon-ring--amber  { background: rgba(245,127,23,.12); color: #D97706; }
 .icon-ring--blue   { background: rgba(2,119,189,.1);   color: #0277BD; }
 .icon-ring--brown  { background: rgba(122,79,44,.1);   color: var(--clr-brown); }
-[data-theme="dark"] .icon-ring--green { background: rgba(76,175,80,.15); }
-[data-theme="dark"] .icon-ring--red   { background: rgba(200,16,46,.18); }
-[data-theme="dark"] .icon-ring--amber { background: rgba(245,127,23,.18); }
-[data-theme="dark"] .icon-ring--blue  { background: rgba(33,150,243,.18); }
+[data-theme="dark"] .icon-ring--green { background: rgba(76,175,80,.15); color: #81C784; }
+[data-theme="dark"] .icon-ring--red   { background: rgba(200,16,46,.18); color: #E57373; }
+[data-theme="dark"] .icon-ring--amber { background: rgba(245,127,23,.18); color: #FFB74D; }
+[data-theme="dark"] .icon-ring--blue  { background: rgba(33,150,243,.18); color: #64B5F6; }
+[data-theme="dark"] .icon-ring--brown { background: rgba(122,79,44,.18); color: #E8D0A0; }
+
+[data-theme="dark"] .alert-success { color: #81C784; }
+[data-theme="dark"] .alert-error   { color: #E57373; }
+[data-theme="dark"] .alert-info    { color: #64B5F6; }
+[data-theme="dark"] .alert-warning { color: #FFB74D; }
+
+[data-theme="dark"] .badge-beige { color: #E8D0A0; }
+[data-theme="dark"] .pos-pill { color: #E8D0A0; }
 
 /* Word Card */
 .word-card {
