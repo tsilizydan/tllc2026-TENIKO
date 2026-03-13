@@ -619,3 +619,157 @@
   .nav__logo-text { display: none; }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   NAV DROPDOWN FIX — Prevent clipping by nav overflow:hidden
+   ══════════════════════════════════════════════════════════════ */
+
+/* The nav__inner flex row had overflow:hidden which clips the dropdown.
+   Fix: keep the logo+links side contained, let actions overflow visibly */
+.nav__inner {
+  overflow: visible !important;    /* allow dropdown to overflow */
+}
+
+/* The nav bar itself must NOT clip vertically */
+.nav {
+  overflow: visible !important;
+}
+
+/* User menu wrapper must be a stacking context so the dropdown
+   appears ABOVE everything, not clipped inside the nav */
+#user-menu-wrap {
+  position: relative;
+  z-index: 1100;
+}
+
+/* Dropdown panel — ensure it's well above hero, cards, etc. */
+.nav__dropdown {
+  z-index: 1200 !important;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 210px;
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(0,0,0,.06);
+  overflow: hidden;
+  animation: ddFadeIn .18s ease;
+}
+[data-theme="dark"] .nav__dropdown {
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+}
+@keyframes ddFadeIn {
+  from { opacity:0; transform:translateY(-8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   FLOATING TOAST NOTIFICATION SYSTEM
+   Replaces disruptive inline flash bars — floats above content
+   ══════════════════════════════════════════════════════════════ */
+
+/* Toast container — top-right, above everything */
+#toast-container {
+  position: fixed;
+  top: calc(var(--nav-height, 68px) + 12px);
+  right: 1.25rem;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: .625rem;
+  pointer-events: none;
+  max-width: min(420px, calc(100vw - 2.5rem));
+}
+
+/* Individual toast pill */
+.toast {
+  pointer-events: all;
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .875rem 1.125rem;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(0,0,0,.06);
+  font-size: .875rem;
+  font-weight: 500;
+  line-height: 1.45;
+  animation: toastIn .28s cubic-bezier(.34,1.56,.64,1) both;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid transparent;
+  max-width: 100%;
+  position: relative;
+}
+.toast.toast--hiding {
+  animation: toastOut .25s ease forwards;
+}
+@keyframes toastIn {
+  from { opacity:0; transform:translateX(24px) scale(.96); }
+  to   { opacity:1; transform:translateX(0) scale(1); }
+}
+@keyframes toastOut {
+  to   { opacity:0; transform:translateX(20px) scale(.95); }
+}
+
+/* Toast colour variants */
+.toast--success {
+  background: rgba(237,247,237,.97);
+  border-color: rgba(46,125,50,.2);
+  color: #1b5e20;
+}
+.toast--error {
+  background: rgba(253,237,237,.97);
+  border-color: rgba(200,16,46,.2);
+  color: #7f1a1a;
+}
+.toast--info {
+  background: rgba(232,244,253,.97);
+  border-color: rgba(2,119,189,.2);
+  color: #013e69;
+}
+.toast--warning {
+  background: rgba(255,248,225,.97);
+  border-color: rgba(245,127,23,.25);
+  color: #7a4a00;
+}
+[data-theme="dark"] .toast--success { background: rgba(27,69,27,.93); color:#a5d6a7; border-color:rgba(76,175,80,.25); }
+[data-theme="dark"] .toast--error   { background: rgba(70,20,20,.93); color:#ef9a9a; border-color:rgba(200,16,46,.3); }
+[data-theme="dark"] .toast--info    { background: rgba(13,50,80,.93); color:#80cbc4; border-color:rgba(2,119,189,.3); }
+[data-theme="dark"] .toast--warning { background: rgba(60,40,10,.93); color:#ffcc80; border-color:rgba(245,127,23,.3); }
+
+/* Toast icon */
+.toast__icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+/* Toast body */
+.toast__body { flex: 1; }
+
+/* Toast close button */
+.toast__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: .5;
+  font-size: .875rem;
+  padding: 0 0 0 .375rem;
+  flex-shrink: 0;
+  align-self: flex-start;
+  line-height: 1;
+  transition: opacity .15s;
+  color: inherit;
+}
+.toast__close:hover { opacity: 1; }
+
+/* ── Flash bar: hide the old inline flash bar (we use toasts now) */
+.flash-bar { display: none !important; }
+
+/* ── Mobile toast position */
+@media (max-width: 640px) {
+  #toast-container {
+    top: auto;
+    bottom: 1rem;
+    right: .75rem;
+    left: .75rem;
+    max-width: 100%;
+  }
+}
