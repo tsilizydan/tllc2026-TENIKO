@@ -22,41 +22,68 @@ if (file_exists($envFile)) {
     }
 }
 
-// ── Global exception / error handler ─────────────────────────
-ini_set('display_errors', '0'); // Production: suppress output, errors go to log
+// ── Error Configuration ───────────────────────────────────────
+ini_set('display_errors', '0'); // Never display errors to users in production
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
-set_exception_handler(function (\Throwable $e) {
-    // Log first
-    error_log('[TENIKO] Uncaught ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+// ── Security Headers (PHP-level fallback for Namecheap) ───────
+// These run even if mod_headers is disabled on shared hosting
+if (!headers_sent()) {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-XSS-Protection: 1; mode=block');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+    // Remove PHP version fingerprint
+    header_remove('X-Powered-By');
+}
 
-    // Clean ALL output buffers so partial page HTML is discarded
-    while (ob_get_level() > 0) {
-        ob_end_clean();
+// ── Global Exception Handler (production-safe) ─────────────────
+set_exception_handler(function (\Throwable $e) {
+    // Always log the full details server-side
+    error_log('[TENIKO] Uncaught ' . get_class($e) . ': ' . $e->getMessage()
+        . ' in ' . $e->getFile() . ':' . $e->getLine()
+        . ' — Trace: ' . str_replace("\n", ' | ', $e->getTraceAsString()));
+
+    // Discard any partial output
+    while (ob_get_level() > 0) { ob_end_clean(); }
+
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=UTF-8');
     }
 
-    if (!headers_sent()) http_response_code(500);
-
-    // Show detailed error for diagnosis
-    echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>500 Error — Debug</title><style>body{font-family:monospace;margin:0;padding:2rem;background:#1a1a1a;color:#e8e8e8}</style></head><body>';
-    echo '<div style="background:#450a0a;border:2px solid #dc2626;border-radius:8px;padding:2rem;margin:0 auto;max-width:1000px">';
-    echo '<h2 style="color:#fca5a5;margin:0 0 1rem">' . htmlspecialchars(get_class($e)) . '</h2>';
-    echo '<p><strong style="color:#fca5a5">Message:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
-    echo '<p><strong style="color:#fca5a5">File:</strong> ' . htmlspecialchars($e->getFile()) . ':' . $e->getLine() . '</p>';
-    echo '<pre style="overflow:auto;font-size:12px;color:#d1d5db;background:#111;padding:1rem;border-radius:4px;margin-top:1rem">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
-    echo '<p style="margin-top:1rem"><a href="/" style="color:#60a5fa">Go Home</a></p>';
-    echo '</div></body></html>';
+    // Generic user-facing error — no technical detail exposed
+    echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+        . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        . '<title>Something went wrong — TENIKO</title>'
+        . '<style>*{box-sizing:border-box;margin:0;padding:0}'
+        . 'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;'
+        . 'background:#f9fafb;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}'
+        . '.box{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:3rem;max-width:480px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.08)}'
+        . '.icon{font-size:3rem;margin-bottom:1rem}'
+        . 'h1{font-size:1.5rem;color:#1a1f2e;margin-bottom:.75rem}'
+        . 'p{color:#6b7280;line-height:1.6;margin-bottom:1.5rem}'
+        . 'a{display:inline-block;background:#2E7D32;color:#fff;padding:.625rem 1.5rem;border-radius:9999px;text-decoration:none;font-weight:600}'
+        . 'a:hover{background:#1B5E20}'
+        . '</style></head><body>'
+        . '<div class="box"><div class="icon">🌿</div>'
+        . '<h1>Something went wrong</h1>'
+        . '<p>We\'re sorry — an unexpected error occurred. Our team has been notified and we\'re working on a fix.</p>'
+        . '<a href="/">Return to TENIKO</a></div></body></html>';
+    exit;
 });
 
-// Only convert actual PHP Errors (not notices/warnings) into exceptions
+// ── Global Error Handler ───────────────────────────────────────
 set_error_handler(function (int $severity, string $msg, string $file, int $line): bool {
     if (!($severity & error_reporting())) return false;
-    // Notices, deprecations, strict — just log, don't throw
+    // Non-fatal: log and continue
     if ($severity & (E_NOTICE | E_USER_NOTICE | E_DEPRECATED | E_USER_DEPRECATED | E_STRICT | E_WARNING | E_USER_WARNING)) {
         error_log("[TENIKO] {$msg} in {$file}:{$line}");
         return true;
     }
+    // Fatal: escalate to exception handler
     throw new \ErrorException($msg, 0, $severity, $file, $line);
 });
 
