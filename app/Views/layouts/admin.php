@@ -30,7 +30,8 @@ $navItems = [
   </script>
   <meta name="csrf-token" content="<?= e($csrfToken) ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/admin.css">
@@ -41,18 +42,19 @@ $navItems = [
 <!-- ── Sidebar ──────────────────────────────────────────── -->
 <aside class="admin-sidebar" id="admin-sidebar" role="navigation" aria-label="Admin navigation">
   <a href="/admin" class="admin-sidebar__brand">
+    <img src="/assets/imgs/teniko2.png" alt="TENIKO" width="28" height="28" style="object-fit:contain;border-radius:4px;flex-shrink:0;">
     <span>TENIKO</span>
     <span class="badge-admin">Admin</span>
   </a>
   <nav class="admin-nav">
     <?php $section = ''; foreach ($navItems as [$href, $icon, $label]):
-      if (str_starts_with($href, '---')) { $section = str_replace('---','', $href); continue; }
+      if (strpos($href, '---') === 0) { $section = str_replace('---','', $href); continue; }
     ?>
     <?php if ($section): ?>
       <div class="admin-nav__section"><?= ucfirst($section) ?></div>
       <?php $section = ''; ?>
     <?php endif; ?>
-    <a href="<?= $href ?>" class="admin-nav__item <?= str_starts_with($currentPath, $href) && $href !== '/admin' || $currentPath === $href ? 'active' : '' ?>">
+    <a href="<?= $href ?>" class="admin-nav__item <?= (strpos($currentPath, $href) === 0 && $href !== '/admin') || $currentPath === $href ? 'active' : '' ?>">
       <i class="fa <?= $icon ?>"></i>
       <span><?= $label ?></span>
     </a>
@@ -81,13 +83,21 @@ $navItems = [
     </div>
   </header>
 
-  <!-- Flash messages -->
-  <?php if (!empty($flash_success) || !empty($flash_error) || !empty($flash_info)): ?>
-  <div style="padding:1rem 2rem 0">
-    <?php if (!empty($flash_success)): ?><div class="alert alert-success" data-auto-dismiss><i class="fa fa-check-circle"></i> <?= e($flash_success) ?></div><?php endif; ?>
-    <?php if (!empty($flash_error)):   ?><div class="alert alert-error"   data-auto-dismiss><i class="fa fa-times-circle"></i> <?= e($flash_error) ?></div><?php endif; ?>
-    <?php if (!empty($flash_info)):    ?><div class="alert alert-info"    data-auto-dismiss><i class="fa fa-info-circle"></i> <?= e($flash_info) ?></div><?php endif; ?>
-  </div>
+  <!-- Flash messages as floating toasts -->
+  <div id="toast-container" role="region" aria-live="polite" aria-label="Notifications"></div>
+  <?php
+  $_adminToasts = [];
+  if (!empty($flash_success)) $_adminToasts[] = ['success', 'fa-check-circle',      e($flash_success)];
+  if (!empty($flash_error))   $_adminToasts[] = ['error',   'fa-times-circle',      e($flash_error)];
+  if (!empty($flash_info))    $_adminToasts[] = ['info',    'fa-info-circle',        e($flash_info)];
+  ?>
+  <?php if (!empty($_adminToasts)): ?>
+  <script>
+  document.addEventListener('DOMContentLoaded', function(){
+    var toasts = <?= json_encode($_adminToasts, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+    toasts.forEach(function(t){ window.__showToast && window.__showToast(t[0], t[1], t[2]); });
+  });
+  </script>
   <?php endif; ?>
 
   <main class="admin-content">
