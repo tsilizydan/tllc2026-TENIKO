@@ -1,68 +1,152 @@
-<?php // Admin: Site Settings — $settings (key-value array)
-$csrfToken = \App\Core\CSRF::generate(); ?>
+<?php // Admin: Site Settings — $settings (flat key→value array from allFlat())
+$csrfToken = \App\Core\CSRF::generate();
+
+/** Render a settings field row */
+function settingsField(string $key, string $label, string $type, string $value, string $hint = ''): void {
+    echo '<div class="form-group">';
+    echo '<label class="form-label">' . htmlspecialchars($label) . '</label>';
+    if ($type === 'select-onoff') {
+        echo '<select name="settings['.htmlspecialchars($key).']" class="form-control">';
+        echo '<option value="0"' . ($value === '0' || $value === '' ? ' selected' : '') . '>Disabled</option>';
+        echo '<option value="1"' . ($value === '1' ? ' selected' : '') . '>Enabled</option>';
+        echo '</select>';
+    } elseif ($type === 'textarea') {
+        echo '<textarea name="settings['.htmlspecialchars($key).']" class="form-control" rows="3">'.htmlspecialchars($value).'</textarea>';
+    } else {
+        echo '<input type="'.htmlspecialchars($type).'" name="settings['.htmlspecialchars($key).']" class="form-control" value="'.htmlspecialchars($value).'">';
+    }
+    if ($hint) echo '<span class="form-hint">'.htmlspecialchars($hint).'</span>';
+    echo '</div>';
+}
+?>
 <div style="margin-bottom:1.5rem">
   <h1 style="font-size:1.5rem;font-family:var(--font-heading)">Site Settings</h1>
+  <p style="color:var(--clr-text-muted);font-size:.9rem">All settings are stored in the database and reflect immediately on the public site.</p>
 </div>
 <form action="/admin/settings" method="POST">
   <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
-  <div class="card" style="margin-bottom:1.5rem">
-    <div class="card__body">
-      <h2 style="font-size:1rem;margin-bottom:1.25rem">General</h2>
-      <?php $fields = [
-        ['site_name',        'Site Name',        'text',     'TENIKO'],
-        ['site_tagline',     'Tagline',           'text',     'The Malagasy Language & Culture Encyclopedia'],
-        ['site_email',       'Contact Email',     'email',    'hello@teniko.mg'],
-        ['site_url',         'Site URL',          'url',      'https://teniko.tsilizy.com'],
-        ['maintenance_mode', 'Maintenance Mode',  'select',   '0'],
-      ]; ?>
-      <?php foreach ($fields as [$key, $label, $type, $default]): ?>
-      <div class="form-group">
-        <label class="form-label"><?= $label ?></label>
-        <?php if ($type === 'select'): ?>
-        <select name="settings[<?= $key ?>]" class="form-control">
-          <option value="0" <?= ($settings[$key] ?? '0') === '0' ? 'selected' : '' ?>>Off</option>
-          <option value="1" <?= ($settings[$key] ?? '0') === '1' ? 'selected' : '' ?>>On</option>
-        </select>
-        <?php else: ?>
-        <input type="<?= $type ?>" name="settings[<?= $key ?>]" class="form-control" value="<?= e($settings[$key] ?? $default) ?>">
-        <?php endif; ?>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start">
+    <div>
+
+      <!-- ── General ──────────────────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-globe"></i> General</h2>
+          <?php
+          settingsField('site_name',    'Site Name',     'text',  $settings['site_name']    ?? 'TENIKO');
+          settingsField('site_tagline', 'Tagline',       'text',  $settings['site_tagline'] ?? 'The Malagasy Language & Culture Encyclopedia');
+          settingsField('site_email',   'Contact Email', 'email', $settings['site_email']   ?? '');
+          settingsField('site_url',     'Site URL',      'url',   $settings['site_url']     ?? '');
+          ?>
+          <div class="form-group">
+            <label class="form-label">Maintenance Mode</label>
+            <select name="settings[maintenance_mode]" class="form-control">
+              <option value="0" <?= ($settings['maintenance_mode'] ?? '0') === '0' ? 'selected' : '' ?>>Off — Site is live</option>
+              <option value="1" <?= ($settings['maintenance_mode'] ?? '0') === '1' ? 'selected' : '' ?>>On — Show maintenance page</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <?php endforeach; ?>
+
+      <!-- ── Homepage Content ──────────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-home"></i> Homepage Content</h2>
+          <?php
+          settingsField('homepage_hero_title',    'Hero Title',          'text',     $settings['homepage_hero_title']    ?? 'Discover the Malagasy Language');
+          settingsField('homepage_hero_subtitle', 'Hero Subtitle',       'text',     $settings['homepage_hero_subtitle'] ?? 'Teny — The Living Archive of Malagasy Language & Culture');
+          settingsField('homepage_featured_title','Featured Section Title', 'text',  $settings['homepage_featured_title'] ?? 'Cultural Knowledge');
+          settingsField('homepage_words_title',   'Latest Words Title',  'text',     $settings['homepage_words_title']   ?? 'Latest Words Added');
+          settingsField('homepage_cta_title',     'CTA Heading',         'text',     $settings['homepage_cta_title']     ?? 'Help Build the Archive');
+          settingsField('homepage_cta_text',      'CTA Body Text',       'textarea', $settings['homepage_cta_text']      ?? 'TENIKO grows through community contributions.');
+          ?>
+        </div>
+      </div>
+
+      <!-- ── Announcement Banner ───────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-bullhorn"></i> Announcement Banner</h2>
+          <?php settingsField('announcement_text', 'Message (leave blank to hide)', 'text', $settings['announcement_text'] ?? ''); ?>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select name="settings[announcement_type]" class="form-control">
+              <?php foreach (['info','success','warning'] as $t): ?>
+              <option value="<?= $t ?>" <?= ($settings['announcement_type'] ?? 'info') === $t ? 'selected' : '' ?>><?= ucfirst($t) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div>
+
+      <!-- ── Feature Toggles ──────────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-toggle-on"></i> Feature Toggles</h2>
+          <?php
+          $features = [
+            'features_forums'        => 'Forums',
+            'features_comments'      => 'Comments',
+            'features_registration'  => 'User Registration',
+            'features_contributions' => 'Content Contributions',
+            'features_ads'           => 'Advertisements',
+          ];
+          foreach ($features as $key => $label) {
+              settingsField($key, $label, 'select-onoff', $settings[$key] ?? '1');
+          }
+          ?>
+        </div>
+      </div>
+
+      <!-- ── Social Media ─────────────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-share-alt"></i> Social Media Links</h2>
+          <?php
+          settingsField('social_facebook',  'Facebook URL',  'url', $settings['social_facebook']  ?? '');
+          settingsField('social_twitter',   'Twitter / X URL','url',$settings['social_twitter']   ?? '');
+          settingsField('social_instagram', 'Instagram URL', 'url', $settings['social_instagram'] ?? '');
+          settingsField('social_youtube',   'YouTube URL',   'url', $settings['social_youtube']   ?? '');
+          ?>
+        </div>
+      </div>
+
+      <!-- ── Footer ───────────────────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-align-center"></i> Footer</h2>
+          <?php settingsField('footer_copyright', 'Copyright Text', 'text', $settings['footer_copyright'] ?? '© 2025 TENIKO'); ?>
+        </div>
+      </div>
+
+      <!-- ── Donation Widget ─────────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-heart" style="color:var(--clr-accent)"></i> Floating Donation Widget</h2>
+          <?php
+          settingsField('donate_float_enabled', 'Show Widget', 'select-onoff', $settings['donate_float_enabled'] ?? '0');
+          settingsField('donate_float_message', 'Widget Message', 'text', $settings['donate_float_message'] ?? 'Help us preserve Malagasy language & culture!');
+          ?>
+        </div>
+      </div>
+
+      <!-- ── SEO ──────────────────────────────────────── -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card__body">
+          <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-search"></i> SEO & Analytics</h2>
+          <?php
+          settingsField('meta_description', 'Default Meta Description', 'textarea', $settings['meta_description'] ?? '', 'Used on pages without specific SEO metadata.');
+          settingsField('google_analytics', 'Google Analytics ID', 'text', $settings['google_analytics'] ?? '', 'e.g. G-XXXXXXXXXX');
+          ?>
+        </div>
+      </div>
+
     </div>
   </div>
-  <div class="card" style="margin-bottom:1.5rem">
-    <div class="card__body">
-      <h2 style="font-size:1rem;margin-bottom:1.25rem">Announcement Banner</h2>
-      <div class="form-group">
-        <label class="form-label">Message</label>
-        <input type="text" name="settings[announcement_text]" class="form-control" value="<?= e($settings['announcement_text'] ?? '') ?>" placeholder="Leave blank to hide banner">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Type</label>
-        <select name="settings[announcement_type]" class="form-control">
-          <?php foreach (['info','success','warning'] as $t): ?>
-          <option value="<?= $t ?>" <?= ($settings['announcement_type'] ?? 'info') === $t ? 'selected' : '' ?>><?= ucfirst($t) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-    </div>
+  <div style="margin-top:.5rem">
+    <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-save"></i> Save All Settings</button>
   </div>
-  <div class="card" style="margin-bottom:1.5rem">
-    <div class="card__body">
-      <h2 style="font-size:1rem;margin-bottom:1.25rem"><i class="fa fa-heart" style="color:var(--clr-accent)"></i> Donation Floating Widget</h2>
-      <div class="form-group">
-        <label class="form-label">Show Floating Donation Widget</label>
-        <select name="settings[donate_float_enabled]" class="form-control">
-          <option value="0" <?= ($settings['donate_float_enabled'] ?? '0') === '0' ? 'selected' : '' ?>>Hidden</option>
-          <option value="1" <?= ($settings['donate_float_enabled'] ?? '0') === '1' ? 'selected' : '' ?>>Visible to all visitors</option>
-        </select>
-        <span class="form-hint">When enabled, a donation card appears in the bottom-right corner of all public pages</span>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Widget Message</label>
-        <input type="text" name="settings[donate_float_message]" class="form-control" value="<?= e($settings['donate_float_message'] ?? 'Help us preserve Malagasy language & culture!') ?>" placeholder="Short compelling message">
-      </div>
-    </div>
-  </div>
-  <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-save"></i> Save All Settings</button>
 </form>
