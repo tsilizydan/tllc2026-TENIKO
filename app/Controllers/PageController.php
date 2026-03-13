@@ -36,15 +36,16 @@ class PageController extends Controller
             $this->redirect('/contact');
         }
 
-        // Log to DB for admin review
+        // Save to contact_messages for admin review
         try {
-            $this->db()->insert('activity_logs', [
-                'event'      => 'contact_form',
-                'data'       => json_encode(compact('name', 'email', 'subject', 'message')),
-                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+            $this->db()->insert('contact_messages', [
+                'name'       => $name,
+                'email'      => $email,
+                'subject'    => $subject,
+                'message'    => $message,
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
-        } catch (\Throwable) {}
+        } catch (\Throwable $e) {}
 
         $this->session->flash('success', 'Thank you! Your message has been sent. We\'ll respond within 48 hours.');
         $this->redirect('/contact');
