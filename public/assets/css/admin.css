@@ -10,6 +10,15 @@
 }
 
 /* ---- Sidebar ---- */
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 150;
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+}
 .admin-sidebar {
   width: 256px;
   flex-shrink: 0;
@@ -367,6 +376,11 @@
 @media (max-width: 1280px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 1024px) { .chart-grid { grid-template-columns: 1fr; } }
 @media (max-width: 768px) {
+  .admin-topbar { padding: 0 var(--sp-4); gap: var(--sp-2); }
+  .admin-topbar__actions a.btn { display: none; }
+  .admin-topbar__user span:first-child { display: none; }
+  .admin-topbar__title { font-size: var(--fs-md); }
+  .admin-sidebar-overlay.open { display: block; opacity: 1; }
   .admin-sidebar { position: fixed; transform: translateX(-100%); transition: transform var(--transition-slow); }
   .admin-sidebar.open { transform: translateX(0); }
   .admin-main { margin-left: 0; }
