@@ -4,5 +4,5 @@ Options +FollowSymLinks
 RewriteEngine On
 
 # Redirect to public folder
-RewriteCond %{REQUEST_URI} !^/
+RewriteCond %{REQUEST_URI} !^/public
 RewriteRule ^(.*)$ public/$1 [L]
