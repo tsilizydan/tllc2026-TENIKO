@@ -76,7 +76,7 @@ try {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/supplement.css">
@@ -99,12 +99,7 @@ try {
 
     <!-- Logo -->
     <a href="/" class="nav__logo" aria-label="TENIKO Home">
-      <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="32" height="32" rx="8" fill="#2E7D32"/>
-        <path d="M16 4 C12 4 8 8 8 13 C8 18 12 20 16 22 C20 20 24 18 24 13 C24 8 20 4 16 4Z" fill="white" opacity="0.9"/>
-        <rect x="14" y="22" width="4" height="6" rx="2" fill="white" opacity="0.9"/>
-        <path d="M10 28 Q16 26 22 28" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.9"/>
-      </svg>
+      <img src="/assets/imgs/teniko2.png" alt="TENIKO logo" width="38" height="38" style="object-fit:contain;border-radius:4px;flex-shrink:0;display:block;">
       <span class="nav__logo-text"><?= e($siteName) ?></span>
     </a>
 
@@ -169,7 +164,10 @@ try {
   <div class="nav__drawer__panel">
     <!-- Drawer header -->
     <div class="nav__drawer__header">
-      <span class="nav__drawer__title"><?= e($siteName) ?></span>
+      <a href="/" class="nav__logo" style="text-decoration:none" aria-label="TENIKO Home">
+        <img src="/assets/imgs/teniko2.png" alt="TENIKO" width="32" height="32" style="object-fit:contain;border-radius:4px;flex-shrink:0;">
+        <span class="nav__drawer__title"><?= e($siteName) ?></span>
+      </a>
       <button class="nav__drawer__close btn-icon btn-ghost" id="drawer-close" aria-label="Close menu">
         <i class="fa fa-times"></i>
       </button>
@@ -202,7 +200,7 @@ try {
         ['/donate', 'fa-heart', 'Donate ❤️'],
       ];
       foreach ($drawerLinks as [$href, $icon, $label]):
-        $isActive = ($href === '/' ? $currentPath === '/' : str_starts_with($currentPath, $href));
+        $isActive = ($href === '/' ? $currentPath === '/' : strpos($currentPath, $href) === 0);
       ?>
       <a href="<?= $href ?>" class="nav__drawer__link <?= $isActive ? 'nav__drawer__link--active' : '' ?>">
         <i class="fa <?= $icon ?>" aria-hidden="true"></i>
@@ -247,7 +245,10 @@ try {
   <div class="container">
     <div class="footer__grid">
       <div class="footer__brand">
-        <div class="footer__logo"><?= e($siteName) ?></div>
+        <a href="/" style="display:flex;align-items:center;gap:.75rem;margin-bottom:.875rem;text-decoration:none">
+          <img src="/assets/imgs/teniko2.png" alt="TENIKO" width="44" height="44" style="object-fit:contain;border-radius:6px;filter:brightness(0) invert(1) opacity(.9);flex-shrink:0;">
+          <div class="footer__logo"><?= e($siteName) ?></div>
+        </a>
         <p class="footer__desc">The Living Archive of Malagasy Language &amp; Culture. Preserving and celebrating Madagascar's linguistic heritage for generations to come.</p>
         <div style="display:flex;gap:.75rem;margin-top:1.25rem">
           <a href="#" class="btn-icon" style="color:rgba(255,255,255,.5);font-size:1.1rem" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
