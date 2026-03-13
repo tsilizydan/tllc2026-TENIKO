@@ -23,7 +23,7 @@ if (file_exists($envFile)) {
 }
 
 // ── Global exception / error handler ─────────────────────────
-ini_set('display_errors', '1'); // TEMP: enabled for debugging dialect 500
+ini_set('display_errors', '0'); // Production: suppress output, errors go to log
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
