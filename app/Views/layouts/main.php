@@ -225,14 +225,25 @@ try {
   </div>
 </div>
 
-<!-- ── Flash Messages ─────────────────────────────────────── -->
-<?php if (!empty($flash_success) || !empty($flash_error) || !empty($flash_info) || !empty($flash_warning)): ?>
-<div class="flash-bar container" role="status" aria-live="polite">
-  <?php if (!empty($flash_success)): ?><div class="alert alert-success" data-auto-dismiss><i class="fa fa-check-circle"></i> <?= e($flash_success) ?></div><?php endif; ?>
-  <?php if (!empty($flash_error)):   ?><div class="alert alert-error"   data-auto-dismiss><i class="fa fa-times-circle"></i> <?= e($flash_error) ?></div><?php endif; ?>
-  <?php if (!empty($flash_info)):    ?><div class="alert alert-info"    data-auto-dismiss><i class="fa fa-info-circle"></i> <?= e($flash_info) ?></div><?php endif; ?>
-  <?php if (!empty($flash_warning)): ?><div class="alert alert-warning" data-auto-dismiss><i class="fa fa-exclamation-triangle"></i> <?= e($flash_warning) ?></div><?php endif; ?>
-</div>
+
+<!-- ── Toast Container (floats above all content) ──────────── -->
+<div id="toast-container" role="region" aria-live="polite" aria-label="Notifications"></div>
+
+<!-- Wire PHP flash messages into the toast system -->
+<?php
+$_toasts = [];
+if (!empty($flash_success)) $_toasts[] = ['success', 'fa-check-circle',      e($flash_success)];
+if (!empty($flash_error))   $_toasts[] = ['error',   'fa-times-circle',      e($flash_error)];
+if (!empty($flash_info))    $_toasts[] = ['info',    'fa-info-circle',        e($flash_info)];
+if (!empty($flash_warning)) $_toasts[] = ['warning', 'fa-exclamation-triangle', e($flash_warning)];
+?>
+<?php if (!empty($_toasts)): ?>
+<script>
+(function(){
+  var toasts = <?= json_encode($_toasts, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+  toasts.forEach(function(t){ window.__showToast && window.__showToast(t[0], t[1], t[2]); });
+})();
+</script>
 <?php endif; ?>
 
 <!-- ── Page Content ──────────────────────────────────────── -->
