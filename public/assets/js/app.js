@@ -65,35 +65,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ── Flash Toast Auto-dismiss ──────────────────────────────────────────
-  document.querySelectorAll('.alert[data-auto-dismiss]').forEach(el => {
-    setTimeout(() => {
-      el.style.transition = 'opacity .4s ease, max-height .4s ease';
-      el.style.opacity    = '0';
-      setTimeout(() => el.remove(), 450);
-    }, 5000);
-  });
+  // ── Toast Notification Engine ──────────────────────────────────────────
+  var _iconMap = {
+    success: 'fa-check-circle',
+    error:   'fa-times-circle',
+    info:    'fa-info-circle',
+    warning: 'fa-exclamation-triangle'
+  };
 
-  // ── Toast Notifications ────────────────────────────────────────────────
-  window.showToast = function (msg, type = 'info') {
-    let container = document.getElementById('toast-container');
+  function _buildToast(type, iconClass, msg) {
+    var container = document.getElementById('toast-container');
     if (!container) {
       container = document.createElement('div');
       container.id = 'toast-container';
+      container.setAttribute('role', 'region');
+      container.setAttribute('aria-live', 'polite');
       document.body.appendChild(container);
     }
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-circle' };
-    toast.innerHTML = `<i class="fa ${icons[type] || icons.info}"></i><span>${msg}</span>`;
+    var toast = document.createElement('div');
+    toast.className = 'toast toast--' + (type || 'info');
+    toast.setAttribute('role', 'alert');
+    var safeMsg = String(msg).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    toast.innerHTML =
+      '<i class="fa ' + (iconClass || _iconMap[type] || 'fa-info-circle') + ' toast__icon" aria-hidden="true"></i>' +
+      '<span class="toast__body">' + safeMsg + '</span>' +
+      '<button class="toast__close" aria-label="Dismiss">&times;</button>';
+    toast.querySelector('.toast__close').addEventListener('click', function () {
+      _dismissToast(toast);
+    });
     container.appendChild(toast);
-    // Animate in
-    requestAnimationFrame(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(0)'; });
-    setTimeout(() => {
-      toast.style.opacity   = '0';
-      toast.style.transform = 'translateX(110%)';
-      setTimeout(() => toast.remove(), 350);
-    }, 4000);
+    var timer = setTimeout(function () { _dismissToast(toast); }, 5000);
+    toast._toastTimer = timer;
+  }
+
+  function _dismissToast(toast) {
+    clearTimeout(toast._toastTimer);
+    toast.classList.add('toast--hiding');
+    setTimeout(function () { if (toast.parentNode) toast.remove(); }, 350);
+  }
+
+  // Legacy: showToast(msg, type)
+  window.showToast = function (msg, type) {
+    _buildToast(type || 'info', _iconMap[type || 'info'], String(msg));
+  };
+  // New: __showToast(type, iconClass, msg) — used by PHP flash wiring
+  window.__showToast = function (type, iconClass, msg) {
+    _buildToast(type || 'info', iconClass, String(msg));
   };
 
   // ── Copy Utilities ─────────────────────────────────────────────────────
@@ -212,3 +229,40 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
+
+// ── Global Toast API (__showToast for PHP flash wiring) ────────────────────
+// Called after DOMContentLoaded by PHP-generated inline scripts
+window.__showToast = function (type, iconClass, msg) {
+  var iconMap = {
+    success: 'fa-check-circle',
+    error:   'fa-times-circle',
+    info:    'fa-info-circle',
+    warning: 'fa-exclamation-triangle'
+  };
+  var container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.setAttribute('role', 'region');
+    container.setAttribute('aria-live', 'polite');
+    document.body.appendChild(container);
+  }
+  var toast = document.createElement('div');
+  toast.className = 'toast toast--' + (type || 'info');
+  toast.setAttribute('role', 'alert');
+  var safeMsg = String(msg || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  toast.innerHTML =
+    '<i class="fa ' + (iconClass || iconMap[type] || 'fa-info-circle') + ' toast__icon" aria-hidden="true"></i>' +
+    '<span class="toast__body">' + safeMsg + '</span>' +
+    '<button class="toast__close" aria-label="Dismiss" onclick="this.closest(\'.toast\').remove()">&times;</button>';
+  container.appendChild(toast);
+  var t = setTimeout(function () {
+    toast.classList.add('toast--hiding');
+    setTimeout(function () { if (toast.parentNode) toast.remove(); }, 350);
+  }, 5000);
+  toast.querySelector('.toast__close').addEventListener('click', function () {
+    clearTimeout(t);
+    toast.classList.add('toast--hiding');
+    setTimeout(function () { if (toast.parentNode) toast.remove(); }, 350);
+  });
+};
