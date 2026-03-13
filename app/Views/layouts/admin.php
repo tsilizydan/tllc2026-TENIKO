@@ -4,19 +4,29 @@ $authUser   = \App\Core\Auth::user();
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
 $navItems = [
-  ['/admin',            'fa-tachometer-alt', 'Dashboard'],
-  ['/admin/words',      'fa-book-open',      'Words'],
-  ['/admin/proverbs',   'fa-scroll',         'Proverbs'],
-  ['/admin/articles',   'fa-newspaper',      'Articles'],
-  ['/admin/moderation', 'fa-shield-alt',     'Moderation'],
-  ['---content---', '', ''],
-  ['/admin/users',      'fa-users',          'Users'],
-  ['/admin/ads',        'fa-ad',             'Advertising'],
-  ['/admin/donations',  'fa-hand-holding-heart','Donations'],
-  ['/admin/newsletter', 'fa-envelope-open-text','Newsletter'],
-  ['---system---', '', ''],
-  ['/admin/settings',   'fa-cog',            'Settings'],
-  ['/admin/analytics',  'fa-chart-bar',      'Analytics'],
+  ['/admin',             'fa-tachometer-alt',        'Dashboard'],
+  // ── Content ──────────────────────────────
+  ['---content', '', ''],
+  ['/admin/words',       'fa-book-open',             'Words'],
+  ['/admin/proverbs',    'fa-scroll',                'Proverbs'],
+  ['/admin/articles',    'fa-newspaper',             'Articles'],
+  ['/admin/dialects',    'fa-map-marker-alt',        'Dialects'],
+  ['/admin/moderation',  'fa-shield-alt',            'Submissions'],
+  // ── Community ──────────────────────────────
+  ['---community', '', ''],
+  ['/admin/users',       'fa-users',                 'Users'],
+  ['/admin/comments',    'fa-comments',              'Comments'],
+  ['/admin/forums',      'fa-comment-dots',          'Forums'],
+  // ── Communication ──────────────────────────
+  ['---communication', '', ''],
+  ['/admin/contact',     'fa-inbox',                 'Contact Inbox'],
+  ['/admin/newsletter',  'fa-envelope-open-text',    'Newsletter'],
+  ['/admin/ads',         'fa-ad',                    'Advertising'],
+  ['/admin/donations',   'fa-hand-holding-heart',    'Donations'],
+  // ── System ──────────────────────────────
+  ['---system', '', ''],
+  ['/admin/settings',    'fa-cog',                   'Settings'],
+  ['/admin/analytics',   'fa-chart-bar',             'Analytics'],
 ];
 ?>
 <!DOCTYPE html>
